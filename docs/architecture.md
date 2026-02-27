@@ -101,9 +101,9 @@ The only layer that knows Firebase exists.
 - **`models/`** — the data-format bridge. A model (e.g. `UserModel`) knows how to convert between
   all three formats an object can be in:
     - **`fromFirestore(DocumentSnapshot)`** — parses a Firestore document snapshot
-    - **`UserModel.fromEntity(UserEntity)`** — converts a clean domain entity into a model for
+    - **`fromEntity(Entity)`** — converts a clean domain entity into a model for
       writing to Firestore
-    - **`UserModel.fromMap(Map<String, dynamic>)`** — parses a raw map (e.g. from Firestore or JSON)
+    - **`fromMap(Map<String, dynamic>)`** — parses a raw map (e.g. from Firestore or JSON)
     - **`toMap()`** — serialises to a `Map<String, dynamic>` for writing to Firestore or using the
       Map directly
     - **`toEntity()`** — strips all Firebase/serialisation concerns and returns the plain domain
