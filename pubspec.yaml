@@ -51,6 +51,9 @@ dependencies:
   # Dependency injection
   get_it:
 
+  # Fonts
+  google_fonts:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

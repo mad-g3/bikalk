@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'router.dart';
+import 'theme/theme.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -8,20 +10,27 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  final _router = buildRouter();
+
   @override
   void initState() {
     super.initState();
-    // AuthBLoc DI entry point
+    // AuthBloc DI entry point
   }
 
   @override
   void dispose() {
-    // AuthBLoc DI exit point
+    // AuthBloc DI exit point
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Placeholder(child: Text('The app goes here'));
+    return MaterialApp.router(
+      title: 'Bikalk',
+      debugShowCheckedModeBanner: false,
+      theme: buildAppTheme(),
+      routerConfig: _router,
+    );
   }
 }

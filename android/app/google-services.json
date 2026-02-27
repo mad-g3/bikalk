@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "329560075303",
+    "project_id": "bikalk-69dba",
+    "storage_bucket": "bikalk-69dba.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:329560075303:android:4627e7227b4ade525bf202",
+        "android_client_info": {
+          "package_name": "com.example.bikalk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmyYLwnkmTE3TYl4I6iUjPLgONh9Rm9sc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
