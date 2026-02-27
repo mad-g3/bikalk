@@ -18,7 +18,7 @@ only what we’ll actually use.
     - Google Sign-In
 - Cloud Firestore
     - `users/{uid}` for user profiles
-    - `fare_calculations/{id}` for fare history
+    - `fare_rates/{id}` for fare rates
     - `reports/{id}` for "Report a Problem" CRUD
 - Not used: Firebase App Check, Analytics
 
