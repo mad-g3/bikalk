@@ -46,3 +46,6 @@ app.*.map.json
 
 # Others
 docs_and_planning/
+
+secrets.json
+
