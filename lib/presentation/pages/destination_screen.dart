@@ -89,15 +89,15 @@ class DestinationScreen extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             // color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(5),
                           ),
-                          child: const Text(
-                            'Kimironko',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
+                          // child: const Text(
+                          //   'Kimironko',
+                          //   style: TextStyle(
+                          //     fontWeight: FontWeight.bold,
+                          //     fontSize: 12,
+                          //   ),
+                          // ),
                         ),
                       ],
                     ),

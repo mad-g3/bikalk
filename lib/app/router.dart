@@ -6,7 +6,7 @@ import 'routes.dart';
 
 GoRouter buildRouter() {
   return GoRouter(
-    initialLocation: AppRoutes.destinationLocation,
+    initialLocation: AppRoutes.splash,
     redirect: _redirect,
     routes: [
       // Auth
