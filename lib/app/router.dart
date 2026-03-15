@@ -10,7 +10,7 @@ GoRouter buildRouter() {
       // Auth
       GoRoute(
         path: AppRoutes.splash,
-        pageBuilder: (context, state) => const NoTransitionPage(child: Placeholder()),
+        pageBuilder: (context, state) => const NoTransitionPage(child: SplashPage()),
       ),
       GoRoute(
         path: AppRoutes.signIn,
@@ -68,13 +68,15 @@ GoRouter buildRouter() {
       ),
       GoRoute(
         path: AppRoutes.feedback,
-        pageBuilder: (context, state) => const NoTransitionPage(child: Placeholder()),
+        pageBuilder: (context, state) => const NoTransitionPage(child: FeedbackPage()),
       ),
     ],
   );
 }
 
 // TODO: replace with real auth-gate logic once AuthBloc is wired up
+import '../features/splash/presentation/pages/splash_page.dart';
+import '../features/feedback/presentation/pages/feedback_page.dart';
 String? _redirect(BuildContext context, GoRouterState state) {
   return null;
 }
