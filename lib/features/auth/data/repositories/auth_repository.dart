@@ -96,13 +96,18 @@ class AuthRepository implements IAuthRepository {
 
       final stored = await userSource.getUser(firebase.uid);
       final model = stored ?? UserModel.fromFirebaseUser(firebase);
+      var resultModel = model;
 
       // sync email-verified flag in Firestore
       if (firebase.emailVerified && !model.isEmailVerified) {
         await userSource.updateEmailVerified(firebase.uid, verified: true);
+        final refreshed = await userSource.getUser(firebase.uid);
+        if (refreshed != null) {
+          resultModel = refreshed;
+        }
       }
 
-      return (model.toEntity(), null);
+      return (resultModel.toEntity(), null);
     } catch (_) {
       return (null, const ServerFailure());
     }
