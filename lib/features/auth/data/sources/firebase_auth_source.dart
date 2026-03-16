@@ -20,11 +20,25 @@ class FirebaseAuthSource {
   }
 
   Future<void> updateDisplayName(String name) async {
-    await _auth.currentUser?.updateDisplayName(name);
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: 'Cannot update display name: no signed-in user',
+      );
+    }
+    await user.updateDisplayName(name);
   }
 
   Future<void> sendEmailVerification() async {
-    await _auth.currentUser?.sendEmailVerification();
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: 'Cannot send email verification: no signed-in user',
+      );
+    }
+    await user.sendEmailVerification();
   }
 
   Future<void> sendPasswordResetEmail(String email) {
@@ -36,6 +50,13 @@ class FirebaseAuthSource {
   }
 
   Future<void> reloadUser() async {
-    await _auth.currentUser?.reload();
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: 'Cannot reload user: no signed-in user',
+      );
+    }
+    await user.reload();
   }
 }
