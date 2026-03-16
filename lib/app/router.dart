@@ -128,6 +128,7 @@ const _authRoutes = [
   AppRoutes.signUp,
   AppRoutes.passwordReset,
   AppRoutes.newPassword,
+  AppRoutes.verifyOtp,
 ];
 
 String? _redirect(BuildContext context, GoRouterState state) {
