@@ -63,11 +63,13 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 32),
-                const CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.black,
+                const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.black,
+                  ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 Center(
                   child: Text(
                     'Waiting for verification…',
