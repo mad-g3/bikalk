@@ -39,7 +39,11 @@ class AuthFormField extends StatelessWidget {
           keyboardType: keyboardType,
           textInputAction: textInputAction,
           onFieldSubmitted: onFieldSubmitted,
-          decoration: InputDecoration(hintText: hint, suffixIcon: suffixIcon),
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: hint,
+            suffixIcon: suffixIcon,
+          ),
         ),
       ],
     );
