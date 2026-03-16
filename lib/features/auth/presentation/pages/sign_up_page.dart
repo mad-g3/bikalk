@@ -128,7 +128,9 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Row(
+                      Wrap(
+                        alignment: WrapAlignment.start,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           const Text('By signing up you agree to our '),
                           TextButton(
