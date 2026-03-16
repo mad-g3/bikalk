@@ -7,8 +7,11 @@ import '../features/auth/presentation/pages/new_password_page.dart';
 import '../features/auth/presentation/pages/password_reset_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_up_page.dart';
-import '../features/auth/presentation/pages/splash_page.dart';
+import '../features/splash/presentation/pages/splash_page.dart';
+
+// import '../features/auth/presentation/pages/splash_page.dart';
 import '../features/auth/presentation/pages/verify_email_page.dart';
+import '../features/feedback/presentation/pages/feedback_page.dart';
 import 'di.dart';
 import 'routes.dart';
 
@@ -108,7 +111,7 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.feedback,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: FeedbackPage()),
       ),
     ],
   );
