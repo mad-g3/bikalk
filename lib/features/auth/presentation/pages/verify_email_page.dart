@@ -8,14 +8,14 @@ import '../../../../core/widgets/app_snackbar.dart';
 import '../../application/auth_cubit.dart';
 import '../../application/auth_state.dart';
 
-class VerifyOtpPage extends StatefulWidget {
-  const VerifyOtpPage({super.key});
+class VerifyEmailPage extends StatefulWidget {
+  const VerifyEmailPage({super.key});
 
   @override
-  State<VerifyOtpPage> createState() => _VerifyOtpPageState();
+  State<VerifyEmailPage> createState() => _VerifyEmailPageState();
 }
 
-class _VerifyOtpPageState extends State<VerifyOtpPage> {
+class _VerifyEmailPageState extends State<VerifyEmailPage> {
   Timer? _pollTimer;
 
   @override
@@ -100,14 +100,14 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
   }
 }
 
-class VerifyOtpPageWrapper extends StatelessWidget {
-  const VerifyOtpPageWrapper({super.key});
+class VerifyEmailPageWrapper extends StatelessWidget {
+  const VerifyEmailPageWrapper({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: sl<AuthCubit>(),
-      child: const VerifyOtpPage(),
+      child: const VerifyEmailPage(),
     );
   }
 }

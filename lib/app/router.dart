@@ -8,7 +8,7 @@ import '../features/auth/presentation/pages/password_reset_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_up_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
-import '../features/auth/presentation/pages/verify_otp_page.dart';
+import '../features/auth/presentation/pages/verify_email_page.dart';
 import 'di.dart';
 import 'routes.dart';
 
@@ -52,7 +52,7 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.verifyOtp,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: VerifyOtpPageWrapper()),
+            const NoTransitionPage(child: VerifyEmailPageWrapper()),
       ),
       GoRoute(
         path: AppRoutes.passwordReset,
