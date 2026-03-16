@@ -156,7 +156,11 @@ String? _redirect(BuildContext context, GoRouterState state) {
     return null;
   }
 
-  // AuthInitial / AuthLoading — keep on splash while session is being checked
+  if (authState is AuthLoading) {
+    return null;
+  }
+
+  // AuthInitial — keep on splash while session is being checked
   if (location != AppRoutes.splash) return AppRoutes.splash;
   return null;
 }
