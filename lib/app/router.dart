@@ -1,16 +1,36 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../features/auth/application/auth_cubit.dart';
+import '../features/auth/application/auth_state.dart';
 import '../features/auth/presentation/pages/new_password_page.dart';
 import '../features/auth/presentation/pages/password_reset_page.dart';
 import '../features/auth/presentation/pages/sign_in_page.dart';
 import '../features/auth/presentation/pages/sign_up_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
 import '../features/auth/presentation/pages/verify_otp_page.dart';
+import 'di.dart';
 import 'routes.dart';
+
+// Bridges a Stream into a Listenable so GoRouter re-evaluates redirect on state changes
+class _StreamRefresh extends ChangeNotifier {
+  _StreamRefresh(Stream<dynamic> stream) {
+    _sub = stream.listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _sub;
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
 
 GoRouter buildRouter() {
   return GoRouter(
     initialLocation: AppRoutes.splash,
+    refreshListenable: _StreamRefresh(sl<AuthCubit>().stream),
     redirect: _redirect,
     routes: [
       // Auth
@@ -94,7 +114,45 @@ GoRouter buildRouter() {
   );
 }
 
-// TODO: replace with real auth-gate logic once AuthBloc is wired up
+const _protectedRoutes = [
+  AppRoutes.home,
+  AppRoutes.currentLocation,
+  AppRoutes.destinationLocation,
+  AppRoutes.priceBreakdown,
+  AppRoutes.reportProblem,
+  AppRoutes.feedback,
+];
+
+const _authRoutes = [
+  AppRoutes.signIn,
+  AppRoutes.signUp,
+  AppRoutes.passwordReset,
+  AppRoutes.newPassword,
+];
+
 String? _redirect(BuildContext context, GoRouterState state) {
+  final authState = sl<AuthCubit>().state;
+  final location = state.matchedLocation;
+
+  if (authState is Authenticated) {
+    // Push authenticated users away from auth/splash screens
+    if (_authRoutes.contains(location) || location == AppRoutes.splash) {
+      return AppRoutes.home;
+    }
+    return null;
+  }
+
+  if (authState is AwaitingEmailVerification) {
+    if (location != AppRoutes.verifyOtp) return AppRoutes.verifyOtp;
+    return null;
+  }
+
+  if (authState is Unauthenticated || authState is AuthError) {
+    if (_protectedRoutes.contains(location)) return AppRoutes.signIn;
+    return null;
+  }
+
+  // AuthInitial / AuthLoading — keep on splash while session is being checked
+  if (location != AppRoutes.splash) return AppRoutes.splash;
   return null;
 }

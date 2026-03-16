@@ -21,8 +21,8 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
   @override
   void initState() {
     super.initState();
-    // Poll every 4s to check if Firebase has recorded verification
-    _pollTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+    // Poll every 2s to check if Firebase has recorded verification
+    _pollTimer = Timer.periodic(const Duration(seconds: 2), (_) {
       context.read<AuthCubit>().checkEmailVerified();
     });
   }
