@@ -1,12 +1,12 @@
 ENTITIES (Collections)
 
-1. user
+1. users
    Uses the app - stores customer information*
 
 Attributes:
 userId - unique document identifier
-Name (string) - User's full name
-Email (string) - Email address
+name (string) - User's full name
+email (string) - Email address
 phoneNumber  (string) - Contact number
 isEmailVerified (boolean) - Is Email Verified
 
@@ -27,8 +27,8 @@ fuelPerKm (number, nullable) - Fuel consumption in liters per km
 Attributes:
 reportId - Unique document identifier
 userId (string) - reference to user document ID (points to {userId}
-Category (string) - "app-bug", "pricing-error", "feature-request", "location-issue", "feedback"
-Description (string) - Detailed problem description
+category (string) - "app-bug", "pricing-error", "feature-request", "location-issue", "feedback"
+description (string) - Detailed problem description
 reportedAt (timestamp) - Submission timestamp
 
 RELATIONSHIPS
