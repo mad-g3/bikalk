@@ -9,6 +9,8 @@ class AuthCubit extends Cubit<AuthState> {
 
   // Called on app start to restore an existing session
   Future<void> checkSession() async {
+    if (state is Authenticated) return;
+    if (state is AuthLoading) return;
     emit(const AuthLoading());
     final (user, failure) = await _repository.getCurrentUser();
     if (failure != null) {
