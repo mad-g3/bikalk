@@ -45,7 +45,7 @@ class _SignInPageState extends State<SignInPage> {
         if (state is Authenticated) {
           context.go(AppRoutes.home);
         } else if (state is AwaitingEmailVerification) {
-          context.go(AppRoutes.verifyOtp);
+          context.go(AppRoutes.verifyEmail);
         } else if (state is AuthError) {
           AppSnackBar.error(context, state.message);
         }

@@ -27,7 +27,7 @@ class _SplashPageState extends State<SplashPage> {
         if (state is Authenticated) {
           context.go(AppRoutes.home);
         } else if (state is AwaitingEmailVerification) {
-          context.go(AppRoutes.verifyOtp);
+          context.go(AppRoutes.verifyEmail);
         } else if (state is Unauthenticated) {
           context.go(AppRoutes.signIn);
         }

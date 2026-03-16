@@ -49,7 +49,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AwaitingEmailVerification) {
-          context.go(AppRoutes.verifyOtp);
+          context.go(AppRoutes.verifyEmail);
         } else if (state is AuthError) {
           AppSnackBar.error(context, state.message);
         }

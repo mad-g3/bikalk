@@ -50,7 +50,7 @@ GoRouter buildRouter() {
             const NoTransitionPage(child: SignUpPageWrapper()),
       ),
       GoRoute(
-        path: AppRoutes.verifyOtp,
+        path: AppRoutes.verifyEmail,
         pageBuilder: (context, state) =>
             const NoTransitionPage(child: VerifyEmailPageWrapper()),
       ),
@@ -128,7 +128,7 @@ const _authRoutes = [
   AppRoutes.signUp,
   AppRoutes.passwordReset,
   AppRoutes.newPassword,
-  AppRoutes.verifyOtp,
+  AppRoutes.verifyEmail,
 ];
 
 String? _redirect(BuildContext context, GoRouterState state) {
@@ -144,7 +144,7 @@ String? _redirect(BuildContext context, GoRouterState state) {
   }
 
   if (authState is AwaitingEmailVerification) {
-    if (location != AppRoutes.verifyOtp) return AppRoutes.verifyOtp;
+    if (location != AppRoutes.verifyEmail) return AppRoutes.verifyEmail;
     return null;
   }
 

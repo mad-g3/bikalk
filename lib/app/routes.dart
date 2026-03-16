@@ -3,7 +3,7 @@ class AppRoutes {
   static const splash = '/';
   static const signIn = '/sign-in';
   static const signUp = '/sign-up';
-  static const verifyOtp = '/verify-otp';
+  static const verifyEmail = '/verify-email';
   static const passwordReset = '/password-reset';
   static const newPassword = '/new-password';
 
