@@ -2,8 +2,47 @@ import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_text_styles.dart';
 
-class DestinationScreen extends StatelessWidget {
+class _ContinueButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final String label;
+  const _ContinueButton({
+    required this.onPressed,
+    required this.label,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.ctaFill,
+        foregroundColor: AppColors.ctaText,
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        elevation: 0,
+      ),
+      child: Text(
+        label,
+        style: AppTextStyles.labelLarge.copyWith(color: AppColors.ctaText),
+      ),
+    );
+  }
+}
+
+class DestinationScreen extends StatefulWidget {
   const DestinationScreen({super.key});
+
+  @override
+  State<DestinationScreen> createState() => _DestinationScreenState();
+}
+
+class _DestinationScreenState extends State<DestinationScreen> {
+  final _destinationController = TextEditingController();
+
+  @override
+  void dispose() {
+    _destinationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +70,8 @@ class DestinationScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 40),
-              // Destination Input Placeholder
+              // Destination Input
               Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 20,
-                ),
                 decoration: BoxDecoration(
                   color: AppColors.cardSurface,
                   borderRadius: BorderRadius.circular(12),
@@ -51,10 +86,19 @@ class DestinationScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Text(
-                  'Kimironko',
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    color: AppColors.textSecondary,
+                child: TextField(
+                  controller: _destinationController,
+                  style: AppTextStyles.bodyLarge,
+                  decoration: InputDecoration(
+                    hintText: 'Kimironko',
+                    hintStyle: AppTextStyles.bodyLarge.copyWith(
+                      color: AppColors.textHint,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 20,
+                    ),
+                    border: InputBorder.none,
                   ),
                 ),
               ),
@@ -65,12 +109,6 @@ class DestinationScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(20),
-                    image: const DecorationImage(
-                      image: AssetImage(
-                        'assets/images/map_placeholder.png',
-                      ), // Placeholder path
-                      fit: BoxFit.cover,
-                    ),
                   ),
                   child: Center(
                     child: Column(
@@ -88,16 +126,8 @@ class DestinationScreen extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            // color: Colors.white,
                             borderRadius: BorderRadius.circular(5),
                           ),
-                          // child: const Text(
-                          //   'Kimironko',
-                          //   style: TextStyle(
-                          //     fontWeight: FontWeight.bold,
-                          //     fontSize: 12,
-                          //   ),
-                          // ),
                         ),
                       ],
                     ),
@@ -107,7 +137,7 @@ class DestinationScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Center(
                 child: Text(
-                  'Long press to change the destination',
+                  'Destination Preview',
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textHint,
                   ),
@@ -115,25 +145,11 @@ class DestinationScreen extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               // Continue Button
-              ElevatedButton(
+              _ContinueButton(
                 onPressed: () {
-                  // Navigation logic later
+                  // Navigation logic
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.ctaFill,
-                  foregroundColor: AppColors.ctaText,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Continue',
-                  style: AppTextStyles.labelLarge.copyWith(
-                    color: AppColors.ctaText,
-                  ),
-                ),
+                label: 'Continue',
               ),
               const SizedBox(height: 20),
             ],

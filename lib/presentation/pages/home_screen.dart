@@ -105,6 +105,7 @@ class _BikeSelectionCard extends StatelessWidget {
 }
 
 class _SafetySection extends StatelessWidget {
+  const _SafetySection();
   @override
   Widget build(BuildContext context) {
     return Column(

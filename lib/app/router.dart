@@ -6,14 +6,14 @@ import 'routes.dart';
 
 GoRouter buildRouter() {
   return GoRouter(
-    initialLocation: AppRoutes.splash,
+    initialLocation: AppRoutes.home,
     redirect: _redirect,
     routes: [
       // Auth
       GoRoute(
         path: AppRoutes.splash,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: DestinationScreen()),
+            const NoTransitionPage(child: Placeholder()),
       ),
       GoRoute(
         path: AppRoutes.signIn,
