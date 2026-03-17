@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
+import '../features/auth/application/auth_cubit.dart';
+import '../features/auth/data/repositories/auth_repository.dart';
+import '../features/auth/data/sources/firebase_auth_source.dart';
+import '../features/auth/data/sources/firestore_user_source.dart';
 
 import '../features/current_location/application/location_cubit.dart';
 import '../features/current_location/data/repositories/location_repository.dart';
@@ -15,13 +19,23 @@ Future<void> setupDi() async {
   sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
 
-  // --- current_location feature ---
+  // Auth sources
+  sl.registerLazySingleton(() => FirebaseAuthSource(sl()));
+  sl.registerLazySingleton(() => FirestoreUserSource(sl()));
 
-  // Sources (stateless — singleton is fine)
+  // Auth repository
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepository(authSource: sl(), userSource: sl()),
+  );
+
+  // Auth cubit — singleton so splash + other pages share the same state
+  sl.registerLazySingleton(() => AuthCubit(sl<AuthRepository>()));
+  
+  // Current location sources (stateless — singleton is fine)
   sl.registerLazySingleton<GeolocatorSource>(() => GeolocatorSource());
   sl.registerLazySingleton<NominatimSource>(() => NominatimSource());
 
-  // Repository
+  // Current location repository
   sl.registerLazySingleton<ILocationRepository>(
     () => LocationRepository(
       geolocatorSource: sl<GeolocatorSource>(),
@@ -29,7 +43,7 @@ Future<void> setupDi() async {
     ),
   );
 
-  // Cubit — factory so each navigation creates a fresh instance
+  // Current location cubit — factory so each navigation creates a fresh instance
   sl.registerFactory<LocationCubit>(
     () => LocationCubit(repository: sl<ILocationRepository>()),
   );
