@@ -10,6 +10,7 @@ import '../features/auth/presentation/pages/sign_up_page.dart';
 import '../features/splash/presentation/pages/splash_page.dart';
 import '../features/auth/presentation/pages/verify_email_page.dart';
 import '../features/feedback/presentation/pages/feedback_page.dart';
+import '../features/terms_conditions/presentation/pages/terms_conditions_screen.dart';
 import 'di.dart';
 import 'routes.dart';
 
@@ -75,7 +76,7 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.termsConditions,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: TermsConditionsScreen()),
       ),
 
       // Core flow
