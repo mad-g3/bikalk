@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bikalk/features/price_breakdown/presentation/pages/price_breakdown_screen.dart' show PriceBreakdownScreen;
+import 'package:bikalk/features/privacy_policy/presentation/pages/privacy_policy_screen.dart' show PrivacyPolicyScreen;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../features/auth/application/auth_cubit.dart';
@@ -72,7 +73,7 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.privacyPolicy,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: PriceBreakdownScreen()),
+            const NoTransitionPage(child: PrivacyPolicyScreen ()),
       ),
       GoRoute(
         path: AppRoutes.termsConditions,
