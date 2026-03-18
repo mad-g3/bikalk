@@ -46,7 +46,7 @@ class _SplashPageState extends State<SplashPage>
     _controller.forward();
 
     // Check session after a short delay so the animation is visible
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 1000), () {
       if (mounted) {
         context.read<AuthCubit>().checkSession();
       }
