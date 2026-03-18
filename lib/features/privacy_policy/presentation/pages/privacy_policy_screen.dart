@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../app/theme/app_colors.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -6,7 +7,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: AppColors.scaffoldBg,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -19,14 +20,14 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   IconButton(
                     icon: const Icon(
                       Icons.arrow_back,
-                      color: Color(0xFFCCCCCC),
+                      color: AppColors.textSecondary,
                     ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   const Text(
                     'privacy-policy s...',
                     style: TextStyle(
-                      color: Color(0xFFAAAAAA),
+                      color: AppColors.textHint,
                       fontSize: 13,
                       fontFamily: 'monospace',
                       letterSpacing: 1,
@@ -41,7 +42,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               child: Container(
                 margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE8E4DC),
+                  color: AppColors.cardSurface,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -59,7 +60,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF1A1A1A),
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             SizedBox(height: 20),
@@ -68,7 +69,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 13,
                                 height: 1.75,
-                                color: Color(0xFF333333),
+                                color: AppColors.textSecondary,
                               ),
                             ),
                             SizedBox(height: 16),
@@ -77,7 +78,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 13,
                                 height: 1.75,
-                                color: Color(0xFF333333),
+                                color: AppColors.textSecondary,
                               ),
                             ),
                           ],
@@ -94,8 +95,8 @@ class PrivacyPolicyScreen extends StatelessWidget {
                           onPressed: () =>
                               Navigator.pushNamed(context, '/terms'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF111111),
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColors.ctaFill,
+                            foregroundColor: AppColors.ctaText,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
