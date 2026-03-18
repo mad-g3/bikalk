@@ -72,7 +72,7 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.privacyPolicy,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: PriceBreakdownScreen()),
       ),
       GoRoute(
         path: AppRoutes.termsConditions,
