@@ -5,6 +5,10 @@ import '../features/auth/application/auth_cubit.dart';
 import '../features/auth/data/repositories/auth_repository.dart';
 import '../features/auth/data/sources/firebase_auth_source.dart';
 import '../features/auth/data/sources/firestore_user_source.dart';
+import '../features/feedback/application/feedback_cubit.dart';
+import '../features/feedback/data/repositories/feedback_repository.dart';
+import '../features/feedback/data/sources/feedback_firestore_source.dart';
+import '../features/feedback/domain/repositories/i_feedback_repository.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -24,4 +28,15 @@ Future<void> setupDi() async {
 
   // Auth cubit — singleton so splash + other pages share the same state
   sl.registerLazySingleton(() => AuthCubit(sl<AuthRepository>()));
+
+  // Feedback source
+  sl.registerLazySingleton(() => FeedbackFirestoreSource(sl(), sl()));
+
+  // Feedback repository
+  sl.registerLazySingleton<IFeedbackRepository>(
+    () => FeedbackRepository(source: sl()),
+  );
+
+  // Feedback cubit
+  sl.registerFactory(() => FeedbackCubit(sl<IFeedbackRepository>()));
 }

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/di.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../application/feedback_cubit.dart';
+import '../../application/feedback_state.dart';
 
 class FeedbackPage extends StatefulWidget {
   const FeedbackPage({super.key});
@@ -13,7 +17,6 @@ class FeedbackPage extends StatefulWidget {
 
 class _FeedbackPageState extends State<FeedbackPage> {
   final TextEditingController _feedbackController = TextEditingController();
-  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -21,31 +24,8 @@ class _FeedbackPageState extends State<FeedbackPage> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    final text = _feedbackController.text.trim();
-    if (text.isEmpty) return;
-
-    setState(() => _isSubmitting = true);
-
-    // TODO: wire up to actual feedback submission (e.g. Firestore)
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    if (!mounted) return;
-    setState(() => _isSubmitting = false);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Thank you for your feedback!',
-          style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
-        ),
-        backgroundColor: AppColors.brandRose,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-
-    _feedbackController.clear();
+  void _submit() {
+    context.read<FeedbackCubit>().submitFeedback(_feedbackController.text);
   }
 
   void _later() {
@@ -58,110 +38,165 @@ class _FeedbackPageState extends State<FeedbackPage> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      backgroundColor: AppColors.scaffoldBg,
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: screenHeight -
-                  MediaQuery.of(context).padding.top -
-                  MediaQuery.of(context).padding.bottom,
+    return BlocConsumer<FeedbackCubit, FeedbackState>(
+      listener: (context, state) {
+        if (state is FeedbackSubmitSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Thank you for your feedback!',
+                style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
+              ),
+              backgroundColor: AppColors.brandRose,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: IntrinsicHeight(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 48),
+          );
+          _feedbackController.clear();
+        }
 
-                  // Title
-                  Text(
-                    'Feedback',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.headlineMedium.copyWith(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+        if (state is FeedbackSubmitError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                state.message,
+                style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
+              ),
+              backgroundColor: Colors.red.shade700,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        final isSubmitting = state is FeedbackSubmitting;
+        return Scaffold(
+          backgroundColor: AppColors.scaffoldBg,
+          resizeToAvoidBottomInset: true,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight:
+                      screenHeight -
+                      MediaQuery.of(context).padding.top -
+                      MediaQuery.of(context).padding.bottom,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 48),
 
-                  const SizedBox(height: 12),
-
-                  // Subtitle
-                  Text(
-                    'Your feedback helps us stop overcharging\nand stabilize motorcycle rates.',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.textPrimary,
-                      height: 1.5,
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // Text input — fixed tall height
-                  Container(
-                    height: screenHeight * 0.42,
-                    decoration: BoxDecoration(
-                      color: AppColors.cardSurface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.divider, width: 1),
-                    ),
-                    child: TextField(
-                      controller: _feedbackController,
-                      maxLines: null,
-                      expands: true,
-                      keyboardType: TextInputType.multiline,
-                      textAlignVertical: TextAlignVertical.top,
-                      style: AppTextStyles.bodyLarge,
-                      decoration: InputDecoration(
-                        hintText: 'Your feedback goes here!',
-                        hintStyle: AppTextStyles.bodyLarge.copyWith(
-                          color: AppColors.textHint,
+                      // Title
+                      Text(
+                        'Feedback',
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.headlineMedium.copyWith(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
                         ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.all(16),
                       ),
-                    ),
-                  ),
 
-                  const Spacer(),
-                  const SizedBox(height: 24),
+                      const SizedBox(height: 12),
 
-                  // Submit button
-                  _FullWidthButton(
-                    label: 'Submit',
-                    onPressed: _isSubmitting ? null : _submit,
-                    filled: true,
-                    child: _isSubmitting
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
+                      // Subtitle
+                      Text(
+                        'Your feedback helps us stop overcharging\nand stabilize motorcycle rates.',
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: AppColors.textPrimary,
+                          height: 1.5,
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // Text input — fixed tall height
+                      Container(
+                        height: screenHeight * 0.42,
+                        decoration: BoxDecoration(
+                          color: AppColors.cardSurface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: AppColors.divider,
+                            width: 1,
+                          ),
+                        ),
+                        child: TextField(
+                          controller: _feedbackController,
+                          maxLines: null,
+                          expands: true,
+                          keyboardType: TextInputType.multiline,
+                          textAlignVertical: TextAlignVertical.top,
+                          style: AppTextStyles.bodyLarge,
+                          decoration: InputDecoration(
+                            hintText: 'Your feedback goes here!',
+                            hintStyle: AppTextStyles.bodyLarge.copyWith(
+                              color: AppColors.textHint,
                             ),
-                          )
-                        : null,
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.all(16),
+                          ),
+                        ),
+                      ),
+
+                      const Spacer(),
+                      const SizedBox(height: 24),
+
+                      // Submit button
+                      _FullWidthButton(
+                        label: 'Submit',
+                        onPressed: isSubmitting ? null : _submit,
+                        filled: true,
+                        child: isSubmitting
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : null,
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // Later button
+                      _FullWidthButton(
+                        label: 'Later',
+                        onPressed: _later,
+                        filled: false,
+                      ),
+
+                      const SizedBox(height: 32),
+                    ],
                   ),
-
-                  const SizedBox(height: 12),
-
-                  // Later button
-                  _FullWidthButton(
-                    label: 'Later',
-                    onPressed: _later,
-                    filled: false,
-                  ),
-
-                  const SizedBox(height: 32),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
+    );
+  }
+}
+
+class FeedbackPageWrapper extends StatelessWidget {
+  const FeedbackPageWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => sl<FeedbackCubit>(),
+      child: const FeedbackPage(),
     );
   }
 }
@@ -195,7 +230,8 @@ class _FullWidthButton extends StatelessWidget {
             elevation: 2,
             shape: RoundedRectangleBorder(borderRadius: borderRadius),
           ),
-          child: child ??
+          child:
+              child ??
               Text(
                 label,
                 style: AppTextStyles.labelLarge.copyWith(

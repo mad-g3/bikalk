@@ -109,7 +109,7 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.feedback,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: FeedbackPage()),
+            const NoTransitionPage(child: FeedbackPageWrapper()),
       ),
     ],
   );
