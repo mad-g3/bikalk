@@ -2,21 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FeedbackModel {
   const FeedbackModel({
-    required this.message,
+    required this.description,
     required this.userId,
-    required this.userEmail,
+    required this.category,
   });
 
-  final String message;
+  final String description;
   final String? userId;
-  final String? userEmail;
+  final String category;
 
   Map<String, dynamic> toMap() {
     return {
-      'message': message,
       'userId': userId,
-      'userEmail': userEmail,
-      'createdAt': FieldValue.serverTimestamp(),
+      'category': category,
+      'description': description,
+      'reportedAt': FieldValue.serverTimestamp(),
     };
   }
 }

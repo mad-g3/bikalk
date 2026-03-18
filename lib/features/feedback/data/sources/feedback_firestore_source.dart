@@ -10,7 +10,7 @@ class FeedbackFirestoreSource {
   final FirebaseAuth _auth;
 
   CollectionReference<Map<String, dynamic>> get _feedbacks =>
-      _firestore.collection('feedbacks');
+      _firestore.collection('reports');
 
   String? get currentUserId => _auth.currentUser?.uid;
 
