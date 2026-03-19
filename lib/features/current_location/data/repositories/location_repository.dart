@@ -27,14 +27,11 @@ class LocationRepository implements ILocationRepository {
         displayName:
             '${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}',
       );
-    } on Exception catch (e) {
-      if (e.toString().contains('permission_denied')) {
-        throw const PermissionFailure(
-          'Location permission is required to detect your current position.',
-        );
-      }
+    } on PermissionFailure {
+      rethrow;
+    } on Exception {
       throw const ServerFailure(
-        'Could not detect your location right now. Please try again.',
+        'Location permission is required to detect your current position.',
       );
     }
   }

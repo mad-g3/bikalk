@@ -16,6 +16,7 @@ class LocationCubit extends Cubit<LocationState> {
 
   final ILocationRepository _repository;
   Timer? _searchDebounce;
+  int _latestSearchToken = 0;
 
   @override
   Future<void> close() {
@@ -38,17 +39,23 @@ class LocationCubit extends Cubit<LocationState> {
     }
 
     emit(state.copyWith(isSearching: true));
+    _latestSearchToken++;
+    final currentToken = _latestSearchToken;
     _searchDebounce = Timer(
       const Duration(milliseconds: 400),
-      () => _runSearch(query),
+      () => _runSearch(query, currentToken),
     );
   }
 
-  Future<void> _runSearch(String query) async {
+  Future<void> _runSearch(String query, int token) async {
     try {
       final results = await _repository.searchLocations(query);
+      // Ignore results from outdated searches.
+      if (token != _latestSearchToken) return;
       emit(state.copyWith(searchResults: results, isSearching: false));
     } on Failure catch (f) {
+      // Ignore errors from outdated searches.
+      if (token != _latestSearchToken) return;
       emit(
         state
             .copyWith(searchResults: const [], isSearching: false)

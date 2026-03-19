@@ -11,6 +11,7 @@ import '../features/splash/presentation/pages/splash_page.dart';
 import '../features/auth/presentation/pages/verify_email_page.dart';
 import '../features/feedback/presentation/pages/feedback_page.dart';
 import '../features/current_location/presentation/screens/current_location_screen.dart';
+import '../features/report_problem/presentation/pages/report_problem_page.dart';
 import 'di.dart';
 import 'routes.dart';
 
@@ -105,7 +106,7 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.reportProblem,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: ReportProblemPage()),
       ),
       GoRoute(
         path: AppRoutes.feedback,

@@ -1,4 +1,5 @@
 import 'package:geolocator/geolocator.dart';
+import '../../../../core/errors/failures.dart';
 
 /// Talks directly to the Geolocator SDK.
 /// Returns raw [Position] objects; throws standard [Exception] on failure.
@@ -6,9 +7,10 @@ import 'package:geolocator/geolocator.dart';
 class GeolocatorSource {
   /// Requests permissions if needed, then returns the current device position.
   ///
-  /// Throws an [Exception] with message `'permission_denied'` when the user
-  /// refuses location access so the repository can map that to a [PermissionFailure].
-  /// Throws an [Exception] for any other error (service disabled, timeout, etc.).
+  /// Throws a [PermissionFailure] (with message `'permission_denied'`) when
+   /// the user refuses location access so the repository can map that to a
+   /// [PermissionFailure]. Throws an [Exception] for any other error (service
+   /// disabled, timeout, etc.).
   Future<Position> getCurrentPosition() async {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -22,7 +24,7 @@ class GeolocatorSource {
 
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
-      throw Exception('permission_denied');
+      throw const PermissionFailure('Location permission is required.');
     }
 
     return Geolocator.getCurrentPosition();

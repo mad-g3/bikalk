@@ -85,7 +85,7 @@ class _LocationViewState extends State<_LocationView> {
     _searchController.text = location.primaryLabel;
     context.read<LocationCubit>().selectLocation(location);
     // Fly using the exact tapped suggestion coordinates.
-    _flyTo(LatLng(location.latitude, location.longitude));
+    // _flyTo(LatLng(location.latitude, location.longitude));
     FocusScope.of(context).unfocus();
   }
 
