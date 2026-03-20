@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_text_styles.dart';
 
-/// Reusable primary CTA button used across multiple screens.
 class ContinueButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String label;

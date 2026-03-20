@@ -1,32 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../app/theme/app_colors.dart';
-import '../../app/theme/app_text_styles.dart';
-
-class _ContinueButton extends StatelessWidget {
-  final VoidCallback? onPressed;
-  final String label;
-  const _ContinueButton({
-    required this.onPressed,
-    required this.label,
-  });
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.ctaFill,
-        foregroundColor: AppColors.ctaText,
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        elevation: 0,
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.labelLarge.copyWith(color: AppColors.ctaText),
-      ),
-    );
-  }
-}
+import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_text_styles.dart';
+import '../../../../core/widgets/continue_button.dart';
 
 class DestinationScreen extends StatefulWidget {
   const DestinationScreen({super.key});
@@ -145,7 +120,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
               ),
               const SizedBox(height: 40),
               // Continue Button
-              _ContinueButton(
+              ContinueButton(
                 onPressed: () {
                   // Navigation logic
                 },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../app/theme/app_colors.dart';
-import '../../app/theme/app_text_styles.dart';
+import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_text_styles.dart';
+import '../../../../core/widgets/continue_button.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -42,7 +43,7 @@ class HomeScreen extends StatelessWidget {
               const Spacer(),
               _SafetySection(),
               const SizedBox(height: 40),
-              _ContinueButton(
+              ContinueButton(
                 onPressed: () {
                   // implement navigation logic
                 },
@@ -146,26 +147,4 @@ class _SafetyListItem extends StatelessWidget {
   }
 }
 
-class _ContinueButton extends StatelessWidget {
-  final VoidCallback onPressed;
 
-  const _ContinueButton({required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.ctaFill,
-        foregroundColor: AppColors.ctaText,
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        elevation: 0,
-      ),
-      child: Text(
-        'Continue',
-        style: AppTextStyles.labelLarge.copyWith(color: AppColors.ctaText),
-      ),
-    );
-  }
-}
