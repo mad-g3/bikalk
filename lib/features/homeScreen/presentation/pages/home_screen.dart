@@ -37,7 +37,7 @@ class HomeScreen extends StatelessWidget {
                 icon: Icons.local_gas_station,
                 label: 'Petrol',
                 onTap: () {
-                  // implement selection logic
+                  //  selection logic
                 },
               ),
               const Spacer(),
@@ -45,7 +45,7 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 40),
               ContinueButton(
                 onPressed: () {
-                  // implement navigation logic
+                  //  navigation logic
                 },
               ),
               const SizedBox(height: 20),
@@ -146,5 +146,3 @@ class _SafetyListItem extends StatelessWidget {
     );
   }
 }
-
-
