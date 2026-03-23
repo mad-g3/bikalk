@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-// Wraps FirebaseAuth — only this class imports firebase_auth
+// Wraps FirebaseAuth — only this class imports firebase_auth / google_sign_in
 class FirebaseAuthSource {
   const FirebaseAuthSource(this._auth);
 
@@ -17,6 +18,13 @@ class FirebaseAuthSource {
       email: email,
       password: password,
     );
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    final googleUser = await GoogleSignIn.instance.authenticate();
+    final idToken = googleUser.authentication.idToken;
+    final credential = GoogleAuthProvider.credential(idToken: idToken);
+    return _auth.signInWithCredential(credential);
   }
 
   Future<void> updateDisplayName(String name) async {
@@ -45,8 +53,8 @@ class FirebaseAuthSource {
     return _auth.sendPasswordResetEmail(email: email);
   }
 
-  Future<void> signOut() {
-    return _auth.signOut();
+  Future<void> signOut() async {
+    await Future.wait([_auth.signOut(), GoogleSignIn.instance.signOut()]);
   }
 
   Future<void> reloadUser() async {
