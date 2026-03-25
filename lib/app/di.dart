@@ -70,7 +70,9 @@ Future<void> setupDi() async {
   );
 
   // Destination location cubit — singleton so destination + downstream screens share state
-  sl.registerLazySingleton(() => DestinationLocationCubit());
+  sl.registerLazySingleton(
+    () => DestinationLocationCubit(repository: sl<ILocationRepository>()),
+  );
 
   // Bike selection cubit
   sl.registerLazySingleton(() => BikeSelectionCubit());

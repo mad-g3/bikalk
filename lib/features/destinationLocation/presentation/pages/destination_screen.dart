@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../app/di.dart';
+import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/widgets/continue_button.dart';
-import '../../../../app/di.dart';
-import '../../../../app/routes.dart';
-import 'package:go_router/go_router.dart';
+import '../../../current_location/domain/entities/location_entity.dart';
+import '../../../current_location/presentation/widgets/location_suggestion_list.dart';
 import '../../application/destination_location_cubit.dart';
+import '../../application/destination_location_state.dart';
+import '../widgets/destination_search_field.dart';
 
 class DestinationScreen extends StatefulWidget {
   const DestinationScreen({super.key});
@@ -15,147 +22,193 @@ class DestinationScreen extends StatefulWidget {
 }
 
 class _DestinationScreenState extends State<DestinationScreen> {
-  final _destinationController = TextEditingController();
+  static const _defaultLatLng = LatLng(-1.9403, 29.8739); // Rwanda overview preview
+
+  final _searchController = TextEditingController();
+  final _focusNode = FocusNode();
+  GoogleMapController? _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChanged);
+  }
 
   @override
   void dispose() {
-    _destinationController.dispose();
+    _searchController.dispose();
+    _focusNode
+      ..removeListener(_onFocusChanged)
+      ..dispose();
+    _mapController?.dispose();
     super.dispose();
+  }
+
+  void _onFocusChanged() {
+    if (!_focusNode.hasFocus && mounted) {
+      // Small delay so suggestion tap handlers fire before results are cleared
+      Future<void>.delayed(const Duration(milliseconds: 120), () {
+        if (!mounted || _focusNode.hasFocus) return;
+        context.read<DestinationLocationCubit>().clearSearchResults();
+      });
+    }
+  }
+
+  Future<void> _flyTo(LatLng target) async {
+    await _mapController?.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: target, zoom: 15.5),
+      ),
+    );
+  }
+
+  void _onSuggestionSelected(LocationEntity location) {
+    _searchController.text = location.primaryLabel;
+    context.read<DestinationLocationCubit>().selectFromSuggestion(location);
+    FocusScope.of(context).unfocus();
+  }
+
+  void _onMapLongPress(LatLng latLng) {
+    context.read<DestinationLocationCubit>().selectFromMapPin(
+      latLng.latitude,
+      latLng.longitude,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.scaffoldBg,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 60),
-              Center(
-                child: Column(
-                  children: [
-                    Text('Destination', style: AppTextStyles.headlineMedium),
+    return BlocConsumer<DestinationLocationCubit, DestinationLocationState>(
+      listenWhen: (_, curr) => curr is DestinationLocationSelected,
+      listener: (context, state) {
+        if (state is DestinationLocationSelected) {
+          _flyTo(LatLng(state.lat, state.lng));
+          // Sync text field for map pin selections; suggestions set it in _onSuggestionSelected
+          if (_searchController.text.isEmpty) {
+            _searchController.text = state.displayName;
+          }
+        }
+      },
+      builder: (context, state) {
+        final markerLatLng = state is DestinationLocationSelected
+            ? LatLng(state.lat, state.lng)
+            : null;
+
+        final isSearching =
+            state is DestinationLocationSearchResults && state.isSearching;
+
+        final suggestions = state is DestinationLocationSearchResults
+            ? state.results
+            : const <LocationEntity>[];
+
+        return Scaffold(
+          backgroundColor: AppColors.scaffoldBg,
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      onPressed: () => Navigator.of(context).maybePop(),
+                      icon: const Icon(Icons.arrow_back, size: 30),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Destination',
+                    style: AppTextStyles.titleLarge.copyWith(fontSize: 38),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Where do you want to go?',
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  DestinationSearchField(
+                    controller: _searchController,
+                    focusNode: _focusNode,
+                    isSearching: isSearching,
+                    onChanged: (q) =>
+                        context.read<DestinationLocationCubit>().scheduleSearch(q),
+                  ),
+                  if (suggestions.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    Text(
-                      'Where do you want to go',
+                    LocationSuggestionList(
+                      suggestions: suggestions,
+                      onSelected: _onSuggestionSelected,
+                    ),
+                  ],
+                  const SizedBox(height: 18),
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: GoogleMap(
+                        initialCameraPosition: const CameraPosition(
+                          target: _defaultLatLng,
+                          zoom: 8,
+                        ),
+                        myLocationButtonEnabled: false,
+                        mapToolbarEnabled: false,
+                        zoomControlsEnabled: false,
+                        onMapCreated: (controller) {
+                          _mapController = controller;
+                          if (markerLatLng != null) {
+                            _flyTo(markerLatLng);
+                          }
+                        },
+                        markers: markerLatLng == null
+                            ? const <Marker>{}
+                            : {
+                                Marker(
+                                  markerId: const MarkerId('destination'),
+                                  position: markerLatLng,
+                                ),
+                              },
+                        onLongPress: _onMapLongPress,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Long press to change the destination',
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 40),
-              // Destination Input
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.cardSurface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.divider.withValues(alpha: 0.5),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: _destinationController,
-                  style: AppTextStyles.bodyLarge,
-                  decoration: InputDecoration(
-                    hintText: 'Kimironko',
-                    hintStyle: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.textHint,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 20,
-                    ),
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              // Map Container Placeholder
-              Expanded(
-                child: GestureDetector(
-                  onLongPressStart: (details) {
-                    // TODO: replace with real lat/lng from Google Maps once integrated
-                    final x = details.localPosition.dx;
-                    final y = details.localPosition.dy;
-                    sl<DestinationLocationCubit>()
-                        .selectDestinationCoordinates(x, y);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.location_on,
-                            color: Colors.red,
-                            size: 40,
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                        ],
+                        color: AppColors.textHint,
                       ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Center(
-                child: Text(
-                  'Long press to change the destination',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textHint,
+                  const SizedBox(height: 20),
+                  ContinueButton(
+                    onPressed: state is DestinationLocationSelected
+                        ? () => context.push(AppRoutes.currentLocation)
+                        : null,
+                    label: 'Continue',
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: 40),
-              // Continue Button
-              ContinueButton(
-                onPressed: () {
-                  final destination = _destinationController.text.trim();
-                  if (destination.isNotEmpty) {
-                    sl<DestinationLocationCubit>().selectDestination(destination);
-                    // Navigate to price breakdown
-                    context.push(AppRoutes.priceBreakdown);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please enter a destination'),
-                        backgroundColor: Colors.orangeAccent,
-                      ),
-                    );
-                  }
-                },
-                label: 'Continue',
-              ),
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
+    );
+  }
+}
+
+// Provides DestinationLocationCubit from DI for this screen
+class DestinationScreenWrapper extends StatelessWidget {
+  const DestinationScreenWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: sl<DestinationLocationCubit>(),
+      child: const DestinationScreen(),
     );
   }
 }
