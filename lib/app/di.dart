@@ -5,7 +5,8 @@ import '../features/auth/application/auth_cubit.dart';
 import '../features/auth/data/repositories/auth_repository.dart';
 import '../features/auth/data/sources/firebase_auth_source.dart';
 import '../features/auth/data/sources/firestore_user_source.dart';
-
+import '../features/destinationLocation/application/destination_location_cubit.dart';
+import '../features/homeScreen/application/bike_selection_cubit.dart';
 import '../features/current_location/application/location_cubit.dart';
 import '../features/current_location/data/repositories/location_repository.dart';
 import '../features/current_location/data/sources/geolocator_source.dart';
@@ -67,4 +68,12 @@ Future<void> setupDi() async {
       firebaseAuth: sl<FirebaseAuth>(),
     ),
   );
+
+  // Destination location cubit — singleton so destination + downstream screens share state
+  sl.registerLazySingleton(
+    () => DestinationLocationCubit(repository: sl<ILocationRepository>()),
+  );
+
+  // Bike selection cubit
+  sl.registerLazySingleton(() => BikeSelectionCubit());
 }
