@@ -69,8 +69,12 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(failure.message));
       return;
     }
+    if (user == null) {
+      emit(AuthError('Unable to sign in with Google. Please try again.'));
+      return;
+    }
     // Google accounts are always email-verified
-    emit(Authenticated(user!));
+    emit(Authenticated(user));
   }
 
   // Polls Firebase to see if user has verified their email

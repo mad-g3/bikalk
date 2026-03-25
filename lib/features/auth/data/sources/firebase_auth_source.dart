@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-// Wraps FirebaseAuth — only this class imports firebase_auth / google_sign_in
+// Wraps FirebaseAuth and GoogleSignIn for authentication operations
 class FirebaseAuthSource {
   const FirebaseAuthSource(this._auth);
 
@@ -54,7 +54,10 @@ class FirebaseAuthSource {
   }
 
   Future<void> signOut() async {
-    await Future.wait([_auth.signOut(), GoogleSignIn.instance.signOut()]);
+    await Future.wait([
+      _auth.signOut(),
+      GoogleSignIn.instance.signOut().catchError((_) {}),
+    ]);
   }
 
   Future<void> reloadUser() async {

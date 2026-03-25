@@ -117,7 +117,10 @@ class AuthRepository implements IAuthRepository {
   Future<(UserEntity?, Failure?)> signInWithGoogle() async {
     try {
       final credential = await authSource.signInWithGoogle();
-      final firebase = credential.user!;
+      final firebase = credential.user;
+      if (firebase == null) {
+        return (null, AuthFailure('Google sign-in failed. Please try again.'));
+      }
 
       final stored = await userSource.getUser(firebase.uid);
       if (stored != null) return (stored.toEntity(), null);
