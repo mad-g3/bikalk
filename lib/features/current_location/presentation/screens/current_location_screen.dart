@@ -11,8 +11,8 @@ import '../../domain/entities/location_entity.dart';
 import '../widgets/location_search_field.dart';
 import '../widgets/location_suggestion_list.dart';
 
-/// Entry point for the current-location screen.
-/// Sets up [LocationCubit] from DI and delegates rendering to [_LocationView].
+// Entry point for the current-location screen.
+// Sets up LocationCubit from DI and delegates rendering to _LocationView.
 class CurrentLocationScreen extends StatelessWidget {
   const CurrentLocationScreen({super.key});
 
@@ -25,10 +25,7 @@ class CurrentLocationScreen extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Private view widget — pure Flutter UI, no business logic
-// ---------------------------------------------------------------------------
-
+// Private view widget, pure Flutter UI, no business logic
 class _LocationView extends StatefulWidget {
   const _LocationView();
 
@@ -37,7 +34,7 @@ class _LocationView extends StatefulWidget {
 }
 
 class _LocationViewState extends State<_LocationView> {
-  static const _defaultLatLng = LatLng(-1.9403, 29.8739); // Rwanda overview
+  static const _defaultLatLng = LatLng(-1.9403, 29.8739); // Rwanda overview preview
 
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
@@ -133,6 +130,7 @@ class _LocationViewState extends State<_LocationView> {
             : LatLng(selectedLocation.latitude, selectedLocation.longitude);
 
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),

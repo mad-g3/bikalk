@@ -101,6 +101,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
             : const <LocationEntity>[];
 
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           backgroundColor: AppColors.scaffoldBg,
           body: SafeArea(
             child: Padding(
