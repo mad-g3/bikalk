@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../features/destinationLocation/presentation/pages/destination_screen.dart';
+import '../features/homeScreen/presentation/pages/home_screen.dart';
 import '../features/auth/application/auth_cubit.dart';
 import '../features/auth/application/auth_state.dart';
 import '../features/auth/presentation/pages/new_password_page.dart';
@@ -10,6 +12,8 @@ import '../features/auth/presentation/pages/sign_up_page.dart';
 import '../features/splash/presentation/pages/splash_page.dart';
 import '../features/auth/presentation/pages/verify_email_page.dart';
 import '../features/feedback/presentation/pages/feedback_page.dart';
+import '../features/current_location/presentation/screens/current_location_screen.dart';
+import '../features/report_problem/presentation/pages/report_problem_page.dart';
 import 'di.dart';
 import 'routes.dart';
 
@@ -82,17 +86,17 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.home,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: HomeScreen()),
       ),
       GoRoute(
         path: AppRoutes.currentLocation,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: CurrentLocationScreenWrapper()),
       ),
       GoRoute(
         path: AppRoutes.destinationLocation,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: DestinationScreenWrapper()),
       ),
       GoRoute(
         path: AppRoutes.priceBreakdown,
@@ -104,7 +108,7 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.reportProblem,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: ReportProblemPage()),
       ),
       GoRoute(
         path: AppRoutes.feedback,
