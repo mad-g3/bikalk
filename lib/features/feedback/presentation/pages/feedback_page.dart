@@ -226,7 +226,7 @@ class _FullWidthButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.ctaFill,
             foregroundColor: AppColors.ctaText,
-            disabledBackgroundColor: AppColors.ctaFill.withOpacity(0.6),
+            disabledBackgroundColor: AppColors.ctaFill.withValues(alpha: 0.6),
             elevation: 2,
             shape: RoundedRectangleBorder(borderRadius: borderRadius),
           ),
