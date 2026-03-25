@@ -91,7 +91,7 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.currentLocation,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: CurrentLocationScreen()),
+            const NoTransitionPage(child: CurrentLocationScreenWrapper()),
       ),
       GoRoute(
         path: AppRoutes.destinationLocation,

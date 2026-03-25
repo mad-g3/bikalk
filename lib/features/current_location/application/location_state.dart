@@ -2,61 +2,59 @@ import 'package:equatable/equatable.dart';
 
 import '../domain/entities/location_entity.dart';
 
-/// Immutable state for [LocationCubit].
-class LocationState extends Equatable {
-  const LocationState({
-    this.selectedLocation,
-    this.searchResults = const [],
-    this.isSearching = false,
-    this.isDetecting = false,
-    this.errorMessage,
-  });
-
-  /// The location the user has confirmed (via search selection, GPS, or map pin).
-  final LocationEntity? selectedLocation;
-
-  /// Live Nominatim suggestions shown while the user types.
-  final List<LocationEntity> searchResults;
-
-  /// True while a Nominatim search HTTP request is in flight.
-  final bool isSearching;
-
-  /// True while the device GPS position is being acquired.
-  final bool isDetecting;
-
-  /// Non-null when the last action produced an error the UI should display.
-  final String? errorMessage;
-
-  LocationState copyWith({
-    LocationEntity? selectedLocation,
-    List<LocationEntity>? searchResults,
-    bool? isSearching,
-    bool? isDetecting,
-    String? errorMessage,
-  }) {
-    return LocationState(
-      selectedLocation: selectedLocation ?? this.selectedLocation,
-      searchResults: searchResults ?? this.searchResults,
-      isSearching: isSearching ?? this.isSearching,
-      isDetecting: isDetecting ?? this.isDetecting,
-      errorMessage: errorMessage ?? this.errorMessage,
-    );
-  }
-
-  /// Returns a copy with [errorMessage] cleared to null.
-  LocationState clearError() => LocationState(
-    selectedLocation: selectedLocation,
-    searchResults: searchResults,
-    isSearching: isSearching,
-    isDetecting: isDetecting,
-  );
+abstract class LocationState extends Equatable {
+  const LocationState();
 
   @override
-  List<Object?> get props => [
-    selectedLocation,
-    searchResults,
-    isSearching,
-    isDetecting,
-    errorMessage,
-  ];
+  List<Object?> get props => [];
+}
+
+// Nothing selected yet
+class LocationInitial extends LocationState {
+  const LocationInitial();
+}
+
+// User is typing; holds live search results and a loading flag
+class LocationSearchResults extends LocationState {
+  const LocationSearchResults({
+    required this.results,
+    this.isSearching = false,
+  });
+
+  final List<LocationEntity> results;
+  final bool isSearching;
+
+  @override
+  List<Object?> get props => [results, isSearching];
+}
+
+// GPS detection is in progress
+class LocationDetecting extends LocationState {
+  const LocationDetecting();
+}
+
+// User confirmed a location (from suggestion, GPS, or map long-press)
+class LocationSelected extends LocationState {
+  const LocationSelected({
+    required this.displayName,
+    required this.lat,
+    required this.lng,
+  });
+
+  final String displayName;
+  final double lat;
+  final double lng;
+
+  @override
+  List<Object?> get props => [displayName, lat, lng];
+}
+
+// An error occurred that the UI should surface
+class LocationError extends LocationState {
+  const LocationError({required this.message});
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
 }

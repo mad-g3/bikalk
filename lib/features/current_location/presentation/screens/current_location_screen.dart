@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/di.dart';
+import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../application/location_cubit.dart';
@@ -11,30 +13,15 @@ import '../../domain/entities/location_entity.dart';
 import '../widgets/location_search_field.dart';
 import '../widgets/location_suggestion_list.dart';
 
-// Entry point for the current-location screen.
-// Sets up LocationCubit from DI and delegates rendering to _LocationView.
-class CurrentLocationScreen extends StatelessWidget {
+class CurrentLocationScreen extends StatefulWidget {
   const CurrentLocationScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<LocationCubit>(),
-      child: const _LocationView(),
-    );
-  }
+  State<CurrentLocationScreen> createState() => _CurrentLocationScreenState();
 }
 
-// Private view widget, pure Flutter UI, no business logic
-class _LocationView extends StatefulWidget {
-  const _LocationView();
-
-  @override
-  State<_LocationView> createState() => _LocationViewState();
-}
-
-class _LocationViewState extends State<_LocationView> {
-  static const _defaultLatLng = LatLng(-1.9403, 29.8739); // Rwanda overview preview
+class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
+  static const _defaultLatLng = LatLng(-1.9403, 29.8739); // Rwanda overview
 
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
@@ -62,7 +49,7 @@ class _LocationViewState extends State<_LocationView> {
 
   void _onFocusChanged() {
     if (!_focusNode.hasFocus && mounted) {
-      // Delay clear slightly so suggestion tap handlers can run first.
+      // Small delay so suggestion tap handlers fire before results are cleared
       Future<void>.delayed(const Duration(milliseconds: 120), () {
         if (!mounted || _focusNode.hasFocus) return;
         context.read<LocationCubit>().clearSearchResults();
@@ -81,8 +68,6 @@ class _LocationViewState extends State<_LocationView> {
   void _onSuggestionSelected(LocationEntity location) {
     _searchController.text = location.primaryLabel;
     context.read<LocationCubit>().selectLocation(location);
-    // Fly using the exact tapped suggestion coordinates.
-    // _flyTo(LatLng(location.latitude, location.longitude));
     FocusScope.of(context).unfocus();
   }
 
@@ -93,41 +78,38 @@ class _LocationViewState extends State<_LocationView> {
     );
   }
 
-  void _onCalculatePressed() {
-    // Placeholder — processing will be implemented later.
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Calculate tapped. Processing will be implemented later.',
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<LocationCubit, LocationState>(
-      // Side effects: fly the map & sync text when a new location is selected.
-      listenWhen: (prev, curr) =>
-          curr.selectedLocation != prev.selectedLocation ||
-          curr.errorMessage != prev.errorMessage,
+      listenWhen: (_, curr) =>
+          curr is LocationSelected || curr is LocationError,
       listener: (context, state) {
-        final loc = state.selectedLocation;
-        if (loc != null) {
-          _flyTo(LatLng(loc.latitude, loc.longitude));
+        if (state is LocationSelected) {
+          _flyTo(LatLng(state.lat, state.lng));
+          // Sync text field for GPS/map-pin selections; suggestions set it in _onSuggestionSelected
+          if (_searchController.text.isEmpty) {
+            _searchController.text = state.displayName;
+          }
         }
-        if (state.errorMessage != null) {
+        if (state is LocationError) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+          ).showSnackBar(SnackBar(content: Text(state.message)));
           context.read<LocationCubit>().clearError();
         }
       },
       builder: (context, state) {
-        final selectedLocation = state.selectedLocation;
-        final markerPosition = selectedLocation == null
-            ? null
-            : LatLng(selectedLocation.latitude, selectedLocation.longitude);
+        final markerLatLng = state is LocationSelected
+            ? LatLng(state.lat, state.lng)
+            : null;
+
+        final isSearching = state is LocationSearchResults && state.isSearching;
+
+        final isDetecting = state is LocationDetecting;
+
+        final suggestions = state is LocationSearchResults
+            ? state.results
+            : const <LocationEntity>[];
 
         return Scaffold(
           resizeToAvoidBottomInset: false,
@@ -166,13 +148,13 @@ class _LocationViewState extends State<_LocationView> {
                         context.read<LocationCubit>().scheduleSearch(q),
                     onDetectLocation: () =>
                         context.read<LocationCubit>().detectLocation(),
-                    isSearching: state.isSearching,
-                    isDetecting: state.isDetecting,
+                    isSearching: isSearching,
+                    isDetecting: isDetecting,
                   ),
-                  if (state.searchResults.isNotEmpty) ...[
+                  if (suggestions.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     LocationSuggestionList(
-                      suggestions: state.searchResults,
+                      suggestions: suggestions,
                       onSelected: _onSuggestionSelected,
                     ),
                   ],
@@ -181,7 +163,7 @@ class _LocationViewState extends State<_LocationView> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: GoogleMap(
-                        initialCameraPosition: CameraPosition(
+                        initialCameraPosition: const CameraPosition(
                           target: _defaultLatLng,
                           zoom: 8,
                         ),
@@ -190,16 +172,16 @@ class _LocationViewState extends State<_LocationView> {
                         zoomControlsEnabled: false,
                         onMapCreated: (controller) {
                           _mapController = controller;
-                          if (markerPosition != null) {
-                            _flyTo(markerPosition);
+                          if (markerLatLng != null) {
+                            _flyTo(markerLatLng);
                           }
                         },
-                        markers: markerPosition == null
+                        markers: markerLatLng == null
                             ? const <Marker>{}
                             : {
                                 Marker(
-                                  markerId: const MarkerId('selected-location'),
-                                  position: markerPosition,
+                                  markerId: const MarkerId('current-location'),
+                                  position: markerLatLng,
                                 ),
                               },
                         onLongPress: _onMapLongPress,
@@ -220,7 +202,9 @@ class _LocationViewState extends State<_LocationView> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _onCalculatePressed,
+                      onPressed: state is LocationSelected
+                          ? () => context.push(AppRoutes.priceBreakdown)
+                          : null,
                       child: const Text('Calculate'),
                     ),
                   ),
@@ -230,6 +214,19 @@ class _LocationViewState extends State<_LocationView> {
           ),
         );
       },
+    );
+  }
+}
+
+// Provides LocationCubit from DI for this screen
+class CurrentLocationScreenWrapper extends StatelessWidget {
+  const CurrentLocationScreenWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: sl<LocationCubit>(),
+      child: const CurrentLocationScreen(),
     );
   }
 }

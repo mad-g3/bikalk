@@ -48,8 +48,8 @@ Future<void> setupDi() async {
     ),
   );
 
-  // Current location cubit — factory so each navigation creates a fresh instance
-  sl.registerFactory<LocationCubit>(
+  // Current location cubit — singleton so state persists across navigation
+  sl.registerLazySingleton<LocationCubit>(
     () => LocationCubit(repository: sl<ILocationRepository>()),
   );
 

@@ -7,12 +7,10 @@ import '../domain/entities/location_entity.dart';
 import '../domain/repositories/i_location_repository.dart';
 import 'location_state.dart';
 
-/// Manages all state for the current-location screen.
-/// No Flutter widgets, no Firebase, no HTTP calls — only domain interfaces.
 class LocationCubit extends Cubit<LocationState> {
   LocationCubit({required ILocationRepository repository})
     : _repository = repository,
-      super(const LocationState());
+      super(const LocationInitial());
 
   final ILocationRepository _repository;
   Timer? _searchDebounce;
@@ -24,98 +22,87 @@ class LocationCubit extends Cubit<LocationState> {
     return super.close();
   }
 
-  // ---------------------------------------------------------------------------
-  // Search
-  // ---------------------------------------------------------------------------
-
-  /// Schedules a debounced Nominatim search for [query].
-  /// Clears results immediately if [query] is too short.
+  // Debounces Nominatim search; clears to initial if query is too short
   void scheduleSearch(String query) {
     _searchDebounce?.cancel();
 
     if (query.trim().length < 2) {
-      emit(state.copyWith(searchResults: const [], isSearching: false));
+      emit(const LocationInitial());
       return;
     }
 
-    emit(state.copyWith(isSearching: true));
+    emit(const LocationSearchResults(results: [], isSearching: true));
     _latestSearchToken++;
-    final currentToken = _latestSearchToken;
+    final token = _latestSearchToken;
     _searchDebounce = Timer(
       const Duration(milliseconds: 400),
-      () => _runSearch(query, currentToken),
+      () => _runSearch(query, token),
     );
   }
 
   Future<void> _runSearch(String query, int token) async {
     try {
       final results = await _repository.searchLocations(query);
-      // Ignore results from outdated searches.
       if (token != _latestSearchToken) return;
-      emit(state.copyWith(searchResults: results, isSearching: false));
+      emit(LocationSearchResults(results: results));
     } on Failure catch (f) {
-      // Ignore errors from outdated searches.
       if (token != _latestSearchToken) return;
-      emit(
-        state
-            .copyWith(searchResults: const [], isSearching: false)
-            .copyWith(errorMessage: f.message),
-      );
+      emit(LocationError(message: f.message));
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // GPS detection
-  // ---------------------------------------------------------------------------
-
-  /// Asks for device GPS position and updates [selectedLocation].
+  // Asks for device GPS position and emits LocationSelected on success
   Future<void> detectLocation() async {
-    emit(state.copyWith(isDetecting: true));
+    emit(const LocationDetecting());
     try {
       final location = await _repository.detectCurrentLocation();
       emit(
-        state.copyWith(
-          selectedLocation: location,
-          isDetecting: false,
-          searchResults: const [],
+        LocationSelected(
+          displayName: location.displayName,
+          lat: location.latitude,
+          lng: location.longitude,
         ),
       );
     } on Failure catch (f) {
-      emit(
-        state.copyWith(isDetecting: false).copyWith(errorMessage: f.message),
-      );
+      emit(LocationError(message: f.message));
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Selection / pinning
-  // ---------------------------------------------------------------------------
-
-  /// Confirms a [location] chosen from the search results list.
+  // Confirms a location chosen from the search results dropdown
   void selectLocation(LocationEntity location) {
-    emit(state.copyWith(selectedLocation: location, searchResults: const []));
-  }
-
-  /// Sets a location from a map long-press using raw [latitude] / [longitude].
-  void pinLocation(double latitude, double longitude) {
+    _searchDebounce?.cancel();
     emit(
-      state.copyWith(
-        selectedLocation: LocationEntity(
-          latitude: latitude,
-          longitude: longitude,
-          displayName:
-              '${latitude.toStringAsFixed(5)}, ${longitude.toStringAsFixed(5)}',
-        ),
-        searchResults: const [],
+      LocationSelected(
+        displayName: location.displayName,
+        lat: location.latitude,
+        lng: location.longitude,
       ),
     );
   }
 
-  /// Clears the [searchResults] list (e.g. when the text field loses focus).
-  void clearSearchResults() {
-    emit(state.copyWith(searchResults: const []));
+  // Sets a location from a map long-press
+  void pinLocation(double lat, double lng) {
+    _searchDebounce?.cancel();
+    emit(
+      LocationSelected(
+        displayName: '${lat.toStringAsFixed(5)}, ${lng.toStringAsFixed(5)}',
+        lat: lat,
+        lng: lng,
+      ),
+    );
   }
 
-  /// Clears the current [errorMessage] after it has been shown.
-  void clearError() => emit(state.clearError());
+  // Clears search results when focus is lost without a selection
+  void clearSearchResults() {
+    if (state is LocationSearchResults) {
+      emit(const LocationInitial());
+    }
+  }
+
+  // Transitions away from LocationError back to initial
+  void clearError() {
+    if (state is LocationError) {
+      emit(const LocationInitial());
+    }
+  }
 }
