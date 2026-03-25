@@ -9,6 +9,15 @@ class DestinationLocationCubit extends Cubit<DestinationLocationState> {
     emit(DestinationLocationSelected(destination));
   }
 
+  /// Stores the user's selected destination from a map long-press (coordinates).
+  void selectDestinationCoordinates(double lat, double lng) {
+    emit(DestinationLocationSelected(
+      '$lat, $lng',
+      lat: lat,
+      lng: lng,
+    ));
+  }
+
   /// Resets back to the initial state (e.g. if the user goes back).
   void clearDestination() {
     emit(const DestinationLocationInitial());

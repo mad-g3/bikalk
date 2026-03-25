@@ -14,10 +14,16 @@ class DestinationLocationInitial extends DestinationLocationState {
 
 /// The user has chosen a destination
 class DestinationLocationSelected extends DestinationLocationState {
-  const DestinationLocationSelected(this.destination);
+  const DestinationLocationSelected(
+    this.destination, {
+    this.lat,
+    this.lng,
+  });
 
   final String destination;
+  final double? lat;
+  final double? lng;
 
   @override
-  List<Object?> get props => [destination];
+  List<Object?> get props => [destination, lat, lng];
 }

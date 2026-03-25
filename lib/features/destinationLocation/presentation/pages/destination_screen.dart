@@ -84,31 +84,40 @@ class _DestinationScreenState extends State<DestinationScreen> {
               const SizedBox(height: 30),
               // Map Container Placeholder
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.location_on,
-                          color: Colors.red,
-                          size: 40,
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
+                child: GestureDetector(
+                  onLongPressStart: (details) {
+                    // TODO: replace with real lat/lng from Google Maps once integrated
+                    final x = details.localPosition.dx;
+                    final y = details.localPosition.dy;
+                    sl<DestinationLocationCubit>()
+                        .selectDestinationCoordinates(x, y);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            color: Colors.red,
+                            size: 40,
                           ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -116,7 +125,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
               const SizedBox(height: 16),
               Center(
                 child: Text(
-                  'Destination Preview',
+                  'Long press to change the destination',
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.textHint,
                   ),
