@@ -1,8 +1,13 @@
 // Domain failure types
-abstract class Failure {
+// Implements Exception so repositories can throw Failure instances
+// and cubits can catch them with `on Failure`.
+abstract class Failure implements Exception {
   const Failure(this.message);
 
   final String message;
+
+  @override
+  String toString() => 'Failure($runtimeType): $message';
 }
 
 class ServerFailure extends Failure {

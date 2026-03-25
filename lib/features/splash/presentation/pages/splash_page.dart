@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/di.dart';
 import '../../../../app/routes.dart';
+import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_text_styles.dart';
 import '../../../auth/application/auth_cubit.dart';
 import '../../../auth/application/auth_state.dart';
 
@@ -14,11 +16,47 @@ class SplashPage extends StatefulWidget {
   State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> {
+class _SplashPageState extends State<SplashPage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fadeIn;
+  late final Animation<double> _slideUp;
+
   @override
   void initState() {
     super.initState();
-    context.read<AuthCubit>().checkSession();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _fadeIn = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
+    );
+
+    _slideUp = Tween<double>(begin: 24.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
+      ),
+    );
+
+    _controller.forward();
+
+    // Check session after a short delay so the animation is visible
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      if (mounted) {
+        context.read<AuthCubit>().checkSession();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -33,22 +71,61 @@ class _SplashPageState extends State<SplashPage> {
           context.go(AppRoutes.signIn);
         }
       },
-      child: const Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // FIXME: add this missing asset
-              // Image.asset('assets/logo.png', height: 120),
-              SizedBox(height: 32),
-              Text(
-                'Welcome to Bikalk',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+      child: Scaffold(
+        backgroundColor: AppColors.scaffoldBg,
+        body: SafeArea(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Opacity(
+                opacity: _fadeIn.value,
+                child: Transform.translate(
+                  offset: Offset(0, _slideUp.value),
+                  child: child,
+                ),
+              );
+            },
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo
+                  Image.asset(
+                    'assets/images/logo.png',
+                    height: 140,
+                  ),
+                  const SizedBox(height: 20),
+                  // App name
+                  Text(
+                    'Bikalk',
+                    style: AppTextStyles.displayLarge.copyWith(
+                      color: AppColors.brandRose,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  // Tagline
+                  Text(
+                    'Transparent Pricing is Peace of mind',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+                  // Loading indicator
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.brandRose,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 16),
-              CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
-            ],
+            ),
           ),
         ),
       ),
@@ -56,7 +133,7 @@ class _SplashPageState extends State<SplashPage> {
   }
 }
 
-// Provides AuthCubit from the DI container for this page
+/// Provides AuthCubit from the DI container for this page
 class SplashPageWrapper extends StatelessWidget {
   const SplashPageWrapper({super.key});
 

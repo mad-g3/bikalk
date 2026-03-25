@@ -2,6 +2,14 @@
 cmake_minimum_required(VERSION 3.14)
 project(bikalk LANGUAGES CXX)
 
+add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+```
+
+Then clean and rebuild:
+```
+flutter clean
+flutter run -d windows
+
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "bikalk")
