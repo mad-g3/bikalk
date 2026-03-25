@@ -20,6 +20,7 @@ class HomeScreen extends StatelessWidget {
     return BlocProvider.value(
       value: sl<BikeSelectionCubit>(),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: AppColors.scaffoldBg,
         body: SafeArea(
           child: Padding(
