@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../widgets/bike_selection_card.dart';
 import '../widgets/safety_section.dart';
 import '../../../../core/widgets/continue_button.dart';
 import '../../../../app/di.dart';
@@ -39,7 +40,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 60),
-                    _BikeSelectionCard(
+                    BikeSelectionCard(
                       icon: Icons.bolt,
                       label: 'Electric',
                       selected: selectedMode == BikeMode.electric,
@@ -50,7 +51,7 @@ class HomeScreen extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 20),
-                    _BikeSelectionCard(
+                    BikeSelectionCard(
                       icon: Icons.local_gas_station,
                       label: 'Petrol',
                       selected: selectedMode == BikeMode.petrol,
@@ -82,56 +83,4 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _BikeSelectionCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _BikeSelectionCard({
-    required this.icon,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        height: 160,
-        decoration: BoxDecoration(
-          color: AppColors.cardSurface,
-          borderRadius: BorderRadius.circular(20),
-          border: selected
-              ? Border.all(color: AppColors.brandRose, width: 2)
-              : Border.all(color: Colors.transparent, width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 48, color: AppColors.textPrimary),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              style: AppTextStyles.bodySmall.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
