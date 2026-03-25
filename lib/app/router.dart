@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../features/destinationLocation/presentation/pages/destination_screen.dart';
+import '../features/homeScreen/presentation/pages/home_screen.dart';
 import '../features/auth/application/auth_cubit.dart';
 import '../features/auth/application/auth_state.dart';
 import '../features/auth/presentation/pages/new_password_page.dart';
@@ -84,17 +86,17 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.home,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: HomeScreen()),
       ),
       GoRoute(
         path: AppRoutes.currentLocation,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: CurrentLocationScreen()),
+            const NoTransitionPage(child: CurrentLocationScreenWrapper()),
       ),
       GoRoute(
         path: AppRoutes.destinationLocation,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: DestinationScreenWrapper()),
       ),
       GoRoute(
         path: AppRoutes.priceBreakdown,

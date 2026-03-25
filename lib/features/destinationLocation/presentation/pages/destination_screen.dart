@@ -7,21 +7,22 @@ import '../../../../app/di.dart';
 import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
-import '../../application/location_cubit.dart';
-import '../../application/location_state.dart';
-import '../../domain/entities/location_entity.dart';
-import '../widgets/location_search_field.dart';
-import '../widgets/location_suggestion_list.dart';
+import '../../../../core/widgets/continue_button.dart';
+import '../../../current_location/domain/entities/location_entity.dart';
+import '../../../current_location/presentation/widgets/location_suggestion_list.dart';
+import '../../application/destination_location_cubit.dart';
+import '../../application/destination_location_state.dart';
+import '../widgets/destination_search_field.dart';
 
-class CurrentLocationScreen extends StatefulWidget {
-  const CurrentLocationScreen({super.key});
+class DestinationScreen extends StatefulWidget {
+  const DestinationScreen({super.key});
 
   @override
-  State<CurrentLocationScreen> createState() => _CurrentLocationScreenState();
+  State<DestinationScreen> createState() => _DestinationScreenState();
 }
 
-class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
-  static const _defaultLatLng = LatLng(-1.9403, 29.8739); // Rwanda overview
+class _DestinationScreenState extends State<DestinationScreen> {
+  static const _defaultLatLng = LatLng(-1.9403, 29.8739); // Rwanda overview preview
 
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
@@ -31,10 +32,6 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   void initState() {
     super.initState();
     _focusNode.addListener(_onFocusChanged);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _focusNode.requestFocus();
-    });
   }
 
   @override
@@ -52,7 +49,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
       // Small delay so suggestion tap handlers fire before results are cleared
       Future<void>.delayed(const Duration(milliseconds: 120), () {
         if (!mounted || _focusNode.hasFocus) return;
-        context.read<LocationCubit>().clearSearchResults();
+        context.read<DestinationLocationCubit>().clearSearchResults();
       });
     }
   }
@@ -67,52 +64,45 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
 
   void _onSuggestionSelected(LocationEntity location) {
     _searchController.text = location.primaryLabel;
-    context.read<LocationCubit>().selectLocation(location);
+    context.read<DestinationLocationCubit>().selectFromSuggestion(location);
     FocusScope.of(context).unfocus();
   }
 
-  void _onMapLongPress(LatLng position) {
-    context.read<LocationCubit>().pinLocation(
-      position.latitude,
-      position.longitude,
+  void _onMapLongPress(LatLng latLng) {
+    context.read<DestinationLocationCubit>().selectFromMapPin(
+      latLng.latitude,
+      latLng.longitude,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<LocationCubit, LocationState>(
-      listenWhen: (_, curr) =>
-          curr is LocationSelected || curr is LocationError,
+    return BlocConsumer<DestinationLocationCubit, DestinationLocationState>(
+      listenWhen: (_, curr) => curr is DestinationLocationSelected,
       listener: (context, state) {
-        if (state is LocationSelected) {
+        if (state is DestinationLocationSelected) {
           _flyTo(LatLng(state.lat, state.lng));
-          // Sync text field for GPS/map-pin selections; suggestions set it in _onSuggestionSelected
+          // Sync text field for map pin selections; suggestions set it in _onSuggestionSelected
           if (_searchController.text.isEmpty) {
             _searchController.text = state.displayName;
           }
         }
-        if (state is LocationError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
-          context.read<LocationCubit>().clearError();
-        }
       },
       builder: (context, state) {
-        final markerLatLng = state is LocationSelected
+        final markerLatLng = state is DestinationLocationSelected
             ? LatLng(state.lat, state.lng)
             : null;
 
-        final isSearching = state is LocationSearchResults && state.isSearching;
+        final isSearching =
+            state is DestinationLocationSearchResults && state.isSearching;
 
-        final isDetecting = state is LocationDetecting;
-
-        final suggestions = state is LocationSearchResults
+        final suggestions = state is DestinationLocationSearchResults
             ? state.results
             : const <LocationEntity>[];
 
         return Scaffold(
           resizeToAvoidBottomInset: false,
+          backgroundColor: AppColors.scaffoldBg,
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
@@ -129,27 +119,23 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Location',
+                    'Destination',
                     style: AppTextStyles.titleLarge.copyWith(fontSize: 38),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Where are you now?',
+                    'Where do you want to go?',
                     style: AppTextStyles.bodyLarge.copyWith(
                       color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 22),
-                  LocationSearchField(
+                  DestinationSearchField(
                     controller: _searchController,
                     focusNode: _focusNode,
-                    autofocus: true,
-                    onChanged: (q) =>
-                        context.read<LocationCubit>().scheduleSearch(q),
-                    onDetectLocation: () =>
-                        context.read<LocationCubit>().detectLocation(),
                     isSearching: isSearching,
-                    isDetecting: isDetecting,
+                    onChanged: (q) =>
+                        context.read<DestinationLocationCubit>().scheduleSearch(q),
                   ),
                   if (suggestions.isNotEmpty) ...[
                     const SizedBox(height: 8),
@@ -180,7 +166,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
                             ? const <Marker>{}
                             : {
                                 Marker(
-                                  markerId: const MarkerId('current-location'),
+                                  markerId: const MarkerId('destination'),
                                   position: markerLatLng,
                                 ),
                               },
@@ -192,21 +178,18 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Long press to change the location',
+                      'Long press to change the destination',
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textHint,
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: state is LocationSelected
-                          ? () => context.push(AppRoutes.priceBreakdown)
-                          : null,
-                      child: const Text('Calculate'),
-                    ),
+                  ContinueButton(
+                    onPressed: state is DestinationLocationSelected
+                        ? () => context.push(AppRoutes.currentLocation)
+                        : null,
+                    label: 'Continue',
                   ),
                 ],
               ),
@@ -218,15 +201,15 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   }
 }
 
-// Provides LocationCubit from DI for this screen
-class CurrentLocationScreenWrapper extends StatelessWidget {
-  const CurrentLocationScreenWrapper({super.key});
+// Provides DestinationLocationCubit from DI for this screen
+class DestinationScreenWrapper extends StatelessWidget {
+  const DestinationScreenWrapper({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: sl<LocationCubit>(),
-      child: const CurrentLocationScreen(),
+      value: sl<DestinationLocationCubit>(),
+      child: const DestinationScreen(),
     );
   }
 }
