@@ -1,0 +1,1 @@
+enum BikeMode { electric, petrol }

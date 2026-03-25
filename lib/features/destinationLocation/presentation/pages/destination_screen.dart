@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/widgets/continue_button.dart';
+import '../../../../app/di.dart';
+import '../../../../app/routes.dart';
+import 'package:go_router/go_router.dart';
+import '../../application/destination_location_cubit.dart';
 
 class DestinationScreen extends StatefulWidget {
   const DestinationScreen({super.key});
@@ -122,7 +126,19 @@ class _DestinationScreenState extends State<DestinationScreen> {
               // Continue Button
               ContinueButton(
                 onPressed: () {
-                  // Navigation logic
+                  final destination = _destinationController.text.trim();
+                  if (destination.isNotEmpty) {
+                    sl<DestinationLocationCubit>().selectDestination(destination);
+                    // Navigate to price breakdown
+                    context.push(AppRoutes.priceBreakdown);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please enter a destination'),
+                        backgroundColor: Colors.orangeAccent,
+                      ),
+                    );
+                  }
                 },
                 label: 'Continue',
               ),

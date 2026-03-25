@@ -6,6 +6,7 @@ import '../features/auth/data/repositories/auth_repository.dart';
 import '../features/auth/data/sources/firebase_auth_source.dart';
 import '../features/auth/data/sources/firestore_user_source.dart';
 import '../features/destinationLocation/application/destination_location_cubit.dart';
+import '../features/homeScreen/application/bike_selection_cubit.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -28,4 +29,7 @@ Future<void> setupDi() async {
 
   // Destination location cubit — singleton so destination + downstream screens share state
   sl.registerLazySingleton(() => DestinationLocationCubit());
+
+  // Bike selection cubit
+  sl.registerLazySingleton(() => BikeSelectionCubit());
 }
