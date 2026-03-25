@@ -48,11 +48,18 @@ dependencies:
   # Navigation
   go_router:
 
+  # Maps + location + geocoding search
+  google_maps_flutter:
+  geolocator:
+  http:
+  pointer_interceptor:
+
   # Dependency injection
   get_it:
 
   # Fonts
   google_fonts:
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:
