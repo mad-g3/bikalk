@@ -26,6 +26,14 @@ class FeedbackRepository implements IFeedbackRepository {
       await source.saveFeedback(model);
       return (true, null);
     } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        return (
+          false,
+          const PermissionFailure(
+            'You do not have permission to submit feedback.',
+          ),
+        );
+      }
       return (false, ServerFailure(_firebaseMessage(e.code)));
     } catch (_) {
       return (false, const ServerFailure('Failed to submit feedback.'));
