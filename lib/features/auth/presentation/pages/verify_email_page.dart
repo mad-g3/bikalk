@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/di.dart';
 import '../../../../app/routes.dart';
 import '../../../../core/widgets/app_snackbar.dart';
+import '../../../../core/widgets/screen_heading.dart';
 import '../../application/auth_cubit.dart';
 import '../../application/auth_state.dart';
 
@@ -46,22 +47,17 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Verify your email')),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Check your inbox',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'We sent a verification link to your email address. '
-                  'Click it to activate your account.',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                const ScreenHeading(
+                  title: 'Check your inbox',
+                  subtitle: 'We sent a verification link to your email address. '
+                      'Click it to activate your account.',
+                  showBackButton: false,
                 ),
                 const SizedBox(height: 32),
                 const Center(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/screen_heading.dart';
 
@@ -40,7 +39,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => context.push(AppRoutes.termsConditions),
+                  onPressed: () => context.pop(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.ctaFill,
                     foregroundColor: AppColors.ctaText,

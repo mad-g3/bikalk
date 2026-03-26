@@ -8,6 +8,7 @@ import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../application/auth_cubit.dart';
 import '../../application/auth_state.dart';
+import '../../../../core/widgets/screen_heading.dart';
 import '../widgets/auth_form_field.dart';
 
 class SignInPage extends StatefulWidget {
@@ -65,15 +66,10 @@ class _SignInPageState extends State<SignInPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 32),
-                      Text(
-                        'Sign in',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Welcome back',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      const ScreenHeading(
+                        title: 'Sign in',
+                        subtitle: 'Welcome back',
+                        showBackButton: false,
                       ),
                       const SizedBox(height: 32),
                       AuthFormField(

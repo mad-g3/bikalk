@@ -8,6 +8,7 @@ import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../application/auth_cubit.dart';
 import '../../application/auth_state.dart';
+import '../../../../core/widgets/screen_heading.dart';
 import '../widgets/auth_form_field.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -70,15 +71,10 @@ class _SignUpPageState extends State<SignUpPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 32),
-                      Text(
-                        'Sign up',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Create your account',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      const ScreenHeading(
+                        title: 'Sign up',
+                        subtitle: 'Create your account',
+                        showBackButton: false,
                       ),
                       const SizedBox(height: 32),
                       AuthFormField(
