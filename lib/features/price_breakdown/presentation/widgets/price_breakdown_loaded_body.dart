@@ -133,7 +133,7 @@ class PriceBreakdownLoadedBody extends StatelessWidget {
 
           // Actions
           ElevatedButton(
-            onPressed: () => context.go(AppRoutes.home),
+            onPressed: () => context.go(AppRoutes.feedback),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.ctaFill,
               foregroundColor: AppColors.ctaText,

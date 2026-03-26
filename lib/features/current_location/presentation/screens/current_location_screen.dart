@@ -32,10 +32,6 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   void initState() {
     super.initState();
     _focusNode.addListener(_onFocusChanged);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _focusNode.requestFocus();
-    });
   }
 
   @override
@@ -127,7 +123,6 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
                   LocationSearchField(
                     controller: _searchController,
                     focusNode: _focusNode,
-                    autofocus: true,
                     onChanged: (q) =>
                         context.read<LocationCubit>().scheduleSearch(q),
                     onDetectLocation: () =>

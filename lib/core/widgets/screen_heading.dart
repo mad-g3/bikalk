@@ -6,39 +6,44 @@ class ScreenHeading extends StatelessWidget {
   const ScreenHeading({
     super.key,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
+    this.showBackButton = true,
   });
 
   final String title;
-  final String subtitle;
+  final String? subtitle;
+  final bool showBackButton;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: IconButton(
-            onPressed: () => Navigator.of(context).maybePop(),
-            icon: const Icon(Icons.arrow_back, size: 24),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
+        if (showBackButton) ...[
+          Align(
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+              onPressed: () => Navigator.of(context).maybePop(),
+              icon: const Icon(Icons.arrow_back, size: 24),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
+        ],
         Text(
           title,
-          style: AppTextStyles.titleLarge.copyWith(fontSize: 32),
+          style: AppTextStyles.headlineMedium,
         ),
-        const SizedBox(height: 6),
-        Text(
-          subtitle,
-          style: AppTextStyles.bodyLarge.copyWith(
-            color: AppColors.textPrimary,
-            fontSize: 12,
+        if (subtitle != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            subtitle!,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textPrimary,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
