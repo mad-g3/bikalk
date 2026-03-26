@@ -8,6 +8,7 @@ import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/widgets/continue_button.dart';
+import '../../../../core/widgets/screen_heading.dart';
 import '../../../current_location/domain/entities/location_entity.dart';
 import '../../../current_location/presentation/widgets/location_suggestion_list.dart';
 import '../../application/destination_location_cubit.dart';
@@ -108,26 +109,9 @@ class _DestinationScreenState extends State<DestinationScreen> {
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
               child: Column(
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.arrow_back, size: 30),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Destination',
-                    style: AppTextStyles.titleLarge.copyWith(fontSize: 38),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Where do you want to go?',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
+                  const ScreenHeading(
+                    title: 'Destination',
+                    subtitle: 'Where do you want to go?',
                   ),
                   const SizedBox(height: 22),
                   DestinationSearchField(

@@ -25,7 +25,7 @@ class LocationRepository implements ILocationRepository {
         latitude: position.latitude,
         longitude: position.longitude,
         displayName:
-            '${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}',
+            'Current Location',
       );
     } on PermissionFailure {
       rethrow;

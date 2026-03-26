@@ -109,10 +109,10 @@ class TermsConditionsScreen extends StatelessWidget {
                             child: ElevatedButton(
                               onPressed: () {
                                 _showToast(context, '✓ Terms Agreed!');
+                                final navigator = Navigator.of(context);
                                 Future.delayed(
                                   const Duration(milliseconds: 800),
-                                  () => Navigator.pushNamedAndRemoveUntil(
-                                    context,
+                                  () => navigator.pushNamedAndRemoveUntil(
                                     '/',
                                     (route) => false,
                                   ),
@@ -147,10 +147,10 @@ class TermsConditionsScreen extends StatelessWidget {
                             child: OutlinedButton(
                               onPressed: () {
                                 _showToast(context, '✗ Terms Declined');
+                                final navigator = Navigator.of(context);
                                 Future.delayed(
                                   const Duration(milliseconds: 800),
-                                  () => Navigator.pushNamedAndRemoveUntil(
-                                    context,
+                                  () => navigator.pushNamedAndRemoveUntil(
                                     '/',
                                     (route) => false,
                                   ),

@@ -7,6 +7,7 @@ import '../../../../app/di.dart';
 import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../core/widgets/screen_heading.dart';
 import '../../application/location_cubit.dart';
 import '../../application/location_state.dart';
 import '../../domain/entities/location_entity.dart';
@@ -118,26 +119,9 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
               child: Column(
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.arrow_back, size: 30),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Location',
-                    style: AppTextStyles.titleLarge.copyWith(fontSize: 38),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Where are you now?',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
+                  const ScreenHeading(
+                    title: 'Location',
+                    subtitle: 'Where are you now?',
                   ),
                   const SizedBox(height: 22),
                   LocationSearchField(

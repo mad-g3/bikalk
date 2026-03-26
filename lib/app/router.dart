@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:bikalk/features/price_breakdown/presentation/pages/price_breakdown_screen.dart' show PriceBreakdownScreen;
+import 'package:bikalk/features/price_breakdown/presentation/pages/price_breakdown_screen.dart' show PriceBreakdownScreenWrapper;
 import 'package:bikalk/features/privacy_policy/presentation/pages/privacy_policy_screen.dart' show PrivacyPolicyScreen;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -104,7 +104,7 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.priceBreakdown,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: PriceBreakdownScreen()),
+            const NoTransitionPage(child: PriceBreakdownScreenWrapper()),
       ),
 
       // Post-result

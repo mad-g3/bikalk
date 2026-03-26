@@ -16,6 +16,9 @@ import '../features/current_location/data/repositories/location_repository.dart'
 import '../features/current_location/data/sources/geolocator_source.dart';
 import '../features/current_location/data/sources/nominatim_source.dart';
 import '../features/current_location/domain/repositories/i_location_repository.dart';
+import '../features/price_breakdown/application/price_breakdown_cubit.dart';
+import '../features/price_breakdown/data/repositories/fare_rate_repository.dart';
+import '../features/price_breakdown/domain/repositories/i_fare_repository.dart';
 import '../features/report_problem/application/report_problem_cubit.dart';
 import '../features/report_problem/data/repositories/problem_report_repository.dart';
 import '../features/report_problem/data/sources/problem_report_firestore_source.dart';
@@ -37,7 +40,7 @@ Future<void> setupDi() async {
     () => AuthRepository(authSource: sl(), userSource: sl()),
   );
 
-  // Auth cubit — singleton so splash + other pages share the same state
+  // Auth cubit singleton so splash + other pages share the same state
   sl.registerLazySingleton(() => AuthCubit(sl<AuthRepository>()));
 
   // Feedback source
@@ -51,7 +54,7 @@ Future<void> setupDi() async {
   // Feedback cubit
   sl.registerFactory(() => FeedbackCubit(sl<IFeedbackRepository>()));
 
-  // Current location sources (stateless — singleton is fine)
+  // Current location sources (stateless singleton is fine)
   sl.registerLazySingleton<GeolocatorSource>(() => GeolocatorSource());
   sl.registerLazySingleton<NominatimSource>(() => NominatimSource());
 
@@ -63,7 +66,7 @@ Future<void> setupDi() async {
     ),
   );
 
-  // Current location cubit — singleton so state persists across navigation
+  // Current location cubit singleton so state persists across navigation
   sl.registerLazySingleton<LocationCubit>(
     () => LocationCubit(repository: sl<ILocationRepository>()),
   );
@@ -76,7 +79,7 @@ Future<void> setupDi() async {
     () => ProblemReportRepository(source: sl<ProblemReportFirestoreSource>()),
   );
 
-  // Report problem cubit — factory so each navigation gets a clean form state
+  // Report problem cubit factory so each navigation gets a clean form state
   sl.registerFactory<ReportProblemCubit>(
     () => ReportProblemCubit(
       repository: sl<IProblemReportRepository>(),
@@ -84,11 +87,21 @@ Future<void> setupDi() async {
     ),
   );
 
-  // Destination location cubit — singleton so destination + downstream screens share state
+  // Destination location cubit singleton so destination + downstream screens share state
   sl.registerLazySingleton(
     () => DestinationLocationCubit(repository: sl<ILocationRepository>()),
   );
 
   // Bike selection cubit
   sl.registerLazySingleton(() => BikeSelectionCubit());
+
+  // Fare rate repository
+  sl.registerLazySingleton<IFareRepository>(
+    () => FareRateRepository(sl<FirebaseFirestore>()),
+  );
+
+  // Price breakdown cubit factory so each navigation recalculates fresh
+  sl.registerFactory<PriceBreakdownCubit>(
+    () => PriceBreakdownCubit(repository: sl<IFareRepository>()),
+  );
 }
