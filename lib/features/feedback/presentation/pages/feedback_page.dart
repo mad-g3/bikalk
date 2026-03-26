@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/di.dart';
-
+import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../application/feedback_cubit.dart';
@@ -17,6 +17,16 @@ class FeedbackPage extends StatefulWidget {
 
 class _FeedbackPageState extends State<FeedbackPage> {
   final TextEditingController _feedbackController = TextEditingController();
+  bool _hasText = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _feedbackController.addListener(() {
+      final hasText = _feedbackController.text.trim().isNotEmpty;
+      if (hasText != _hasText) setState(() => _hasText = hasText);
+    });
+  }
 
   @override
   void dispose() {
@@ -28,11 +38,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
     context.read<FeedbackCubit>().submitFeedback(_feedbackController.text);
   }
 
-  void _later() {
-    if (context.canPop()) {
-      context.pop();
-    }
-  }
+  void _later() => context.go(AppRoutes.home);
 
   @override
   Widget build(BuildContext context) {
@@ -47,14 +53,14 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 'Thank you for your feedback!',
                 style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
               ),
-              backgroundColor: AppColors.brandRose,
+              backgroundColor: AppColors.ctaFill,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
           );
-          _feedbackController.clear();
+          context.go(AppRoutes.home);
         }
 
         if (state is FeedbackSubmitError) {
@@ -153,7 +159,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                       // Submit button
                       _FullWidthButton(
                         label: 'Submit',
-                        onPressed: isSubmitting ? null : _submit,
+                        onPressed: isSubmitting || !_hasText ? null : _submit,
                         filled: true,
                         child: isSubmitting
                             ? const SizedBox(

@@ -8,7 +8,7 @@ class ProblemReportFirestoreSource {
   final FirebaseFirestore _firestore;
 
   CollectionReference<Map<String, dynamic>> get _reports {
-    return _firestore.collection('problem_reports');
+    return _firestore.collection('reports');
   }
 
   Future<void> addProblem(ProblemReportModel report) {
