@@ -16,7 +16,7 @@ class FeedbackModel {
       'userId': userId,
       'category': category,
       'description': description,
-      'reportedAt': FieldValue.serverTimestamp(),
+      'createdAt': FieldValue.serverTimestamp(),
     };
   }
 }
