@@ -85,7 +85,7 @@ class LocationCubit extends Cubit<LocationState> {
     _searchDebounce?.cancel();
     emit(
       LocationSelected(
-        displayName: 'Current Location',
+        displayName: '${lat.toStringAsFixed(5)}, ${lng.toStringAsFixed(5)}',
         lat: lat,
         lng: lng,
       ),
