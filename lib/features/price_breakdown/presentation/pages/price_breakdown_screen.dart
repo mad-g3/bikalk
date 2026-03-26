@@ -7,7 +7,7 @@ import '../../../../core/widgets/screen_heading.dart';
 import '../../../homeScreen/application/bike_selection_cubit.dart';
 import '../../../homeScreen/application/bike_selection_state.dart';
 import '../../../current_location/application/location_cubit.dart';
-import '../../../current_location/application/location_state.dart';
+import '../../../current_location/application/current_location_state.dart';
 import '../../../destinationLocation/application/destination_location_cubit.dart';
 import '../../../destinationLocation/application/destination_location_state.dart';
 import '../../application/price_breakdown_cubit.dart';
@@ -38,7 +38,7 @@ class _PriceBreakdownScreenState extends State<PriceBreakdownScreen> {
     final destinationState = sl<DestinationLocationCubit>().state;
 
     if (bikeState is BikeSelectionUpdated &&
-        locationState is LocationSelected &&
+        locationState is CurrentLocationSelected &&
         destinationState is DestinationLocationSelected) {
       context.read<PriceBreakdownCubit>().calculate(
             bikeMode: bikeState.selectedMode,

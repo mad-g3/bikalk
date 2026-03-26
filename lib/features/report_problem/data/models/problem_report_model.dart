@@ -20,6 +20,7 @@ class ProblemReportModel extends ProblemReportEntity {
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
+      'type': 'problem',
       'category': category,
       'description': description,
       'createdAt': FieldValue.serverTimestamp(),

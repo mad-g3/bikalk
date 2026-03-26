@@ -2,21 +2,21 @@ import 'package:equatable/equatable.dart';
 
 import '../domain/entities/location_entity.dart';
 
-abstract class LocationState extends Equatable {
-  const LocationState();
+abstract class CurrentLocationState extends Equatable {
+  const CurrentLocationState();
 
   @override
   List<Object?> get props => [];
 }
 
 // Nothing selected yet
-class LocationInitial extends LocationState {
-  const LocationInitial();
+class CurrentLocationInitial extends CurrentLocationState {
+  const CurrentLocationInitial();
 }
 
 // User is typing; holds live search results and a loading flag
-class LocationSearchResults extends LocationState {
-  const LocationSearchResults({
+class CurrentLocationSearchResults extends CurrentLocationState {
+  const CurrentLocationSearchResults({
     required this.results,
     this.isSearching = false,
   });
@@ -29,13 +29,13 @@ class LocationSearchResults extends LocationState {
 }
 
 // GPS detection is in progress
-class LocationDetecting extends LocationState {
-  const LocationDetecting();
+class CurrentLocationDetecting extends CurrentLocationState {
+  const CurrentLocationDetecting();
 }
 
 // User confirmed a location (from suggestion, GPS, or map long-press)
-class LocationSelected extends LocationState {
-  const LocationSelected({
+class CurrentLocationSelected extends CurrentLocationState {
+  const CurrentLocationSelected({
     required this.displayName,
     required this.lat,
     required this.lng,
@@ -50,8 +50,8 @@ class LocationSelected extends LocationState {
 }
 
 // An error occurred that the UI should surface
-class LocationError extends LocationState {
-  const LocationError({required this.message});
+class CurrentLocationError extends CurrentLocationState {
+  const CurrentLocationError({required this.message});
 
   final String message;
 

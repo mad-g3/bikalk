@@ -9,7 +9,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/widgets/screen_heading.dart';
 import '../../application/location_cubit.dart';
-import '../../application/location_state.dart';
+import '../../application/current_location_state.dart';
 import '../../domain/entities/location_entity.dart';
 import '../widgets/location_search_field.dart';
 import '../widgets/location_suggestions_overlay.dart';
@@ -22,7 +22,7 @@ class CurrentLocationScreen extends StatefulWidget {
 }
 
 class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
-  static const _defaultLatLng = LatLng(-1.9403, 29.8739);
+  static const _defaultLatLng = LatLng(-1.9403, 29.8739); // Rwanda overview
 
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
@@ -90,11 +90,11 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<LocationCubit, LocationState>(
+    return BlocConsumer<LocationCubit, CurrentLocationState>(
       listenWhen: (_, curr) =>
-          curr is LocationSelected || curr is LocationError,
+          curr is CurrentLocationSelected || curr is CurrentLocationError,
       listener: (context, state) {
-        if (state is LocationSelected) {
+        if (state is CurrentLocationSelected) {
           if (_cameraHandled) {
             _cameraHandled = false;
           } else {
@@ -105,22 +105,22 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
             _searchController.text = state.displayName;
           }
         }
-        if (state is LocationError) {
+        if (state is CurrentLocationError) {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(state.message)));
           context.read<LocationCubit>().clearError();
         }
       },
       builder: (context, state) {
-        final markerLatLng = state is LocationSelected
+        final markerLatLng = state is CurrentLocationSelected
             ? LatLng(state.lat, state.lng)
             : null;
 
         final isSearching =
-            state is LocationSearchResults && state.isSearching;
-        final isDetecting = state is LocationDetecting;
+            state is CurrentLocationSearchResults && state.isSearching;
+        final isDetecting = state is CurrentLocationDetecting;
 
-        final suggestions = state is LocationSearchResults
+        final suggestions = state is CurrentLocationSearchResults
             ? state.results
             : const <LocationEntity>[];
 
@@ -197,7 +197,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: state is LocationSelected
+                          onPressed: state is CurrentLocationSelected
                               ? () => context.push(AppRoutes.priceBreakdown)
                               : null,
                           child: const Text('Calculate'),

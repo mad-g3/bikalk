@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../core/domain/bike_mode.dart';
+
 abstract class PriceBreakdownState extends Equatable {
   const PriceBreakdownState();
 
@@ -32,7 +34,7 @@ class PriceBreakdownLoaded extends PriceBreakdownState {
     this.fuelPerKm,
   });
 
-  final String bikeType;
+  final BikeMode bikeType;
   final String fromLabel;
   final double fromLat;
   final double fromLng;

@@ -5,12 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/errors/failures.dart';
 import '../domain/entities/location_entity.dart';
 import '../domain/repositories/i_location_repository.dart';
-import 'location_state.dart';
+import 'current_location_state.dart';
 
-class LocationCubit extends Cubit<LocationState> {
+class LocationCubit extends Cubit<CurrentLocationState> {
   LocationCubit({required ILocationRepository repository})
     : _repository = repository,
-      super(const LocationInitial());
+      super(const CurrentLocationInitial());
 
   final ILocationRepository _repository;
   Timer? _searchDebounce;
@@ -27,11 +27,11 @@ class LocationCubit extends Cubit<LocationState> {
     _searchDebounce?.cancel();
 
     if (query.trim().length < 2) {
-      emit(const LocationInitial());
+      emit(const CurrentLocationInitial());
       return;
     }
 
-    emit(const LocationSearchResults(results: [], isSearching: true));
+    emit(const CurrentLocationSearchResults(results: [], isSearching: true));
     _latestSearchToken++;
     final token = _latestSearchToken;
     _searchDebounce = Timer(
@@ -44,27 +44,27 @@ class LocationCubit extends Cubit<LocationState> {
     try {
       final results = await _repository.searchLocations(query);
       if (token != _latestSearchToken) return;
-      emit(LocationSearchResults(results: results));
+      emit(CurrentLocationSearchResults(results: results));
     } on Failure catch (f) {
       if (token != _latestSearchToken) return;
-      emit(LocationError(message: f.message));
+      emit(CurrentLocationError(message: f.message));
     }
   }
 
-  // Asks for device GPS position and emits LocationSelected on success
+  // Asks for device GPS position and emits CurrentLocationSelected on success
   Future<void> detectLocation() async {
-    emit(const LocationDetecting());
+    emit(const CurrentLocationDetecting());
     try {
       final location = await _repository.detectCurrentLocation();
       emit(
-        LocationSelected(
+        CurrentLocationSelected(
           displayName: location.displayName,
           lat: location.latitude,
           lng: location.longitude,
         ),
       );
     } on Failure catch (f) {
-      emit(LocationError(message: f.message));
+      emit(CurrentLocationError(message: f.message));
     }
   }
 
@@ -72,7 +72,7 @@ class LocationCubit extends Cubit<LocationState> {
   void selectLocation(LocationEntity location) {
     _searchDebounce?.cancel();
     emit(
-      LocationSelected(
+      CurrentLocationSelected(
         displayName: location.displayName,
         lat: location.latitude,
         lng: location.longitude,
@@ -84,7 +84,7 @@ class LocationCubit extends Cubit<LocationState> {
   void pinLocation(double lat, double lng) {
     _searchDebounce?.cancel();
     emit(
-      LocationSelected(
+      CurrentLocationSelected(
         displayName: '${lat.toStringAsFixed(5)}, ${lng.toStringAsFixed(5)}',
         lat: lat,
         lng: lng,
@@ -94,15 +94,15 @@ class LocationCubit extends Cubit<LocationState> {
 
   // Clears search results when focus is lost without a selection
   void clearSearchResults() {
-    if (state is LocationSearchResults) {
-      emit(const LocationInitial());
+    if (state is CurrentLocationSearchResults) {
+      emit(const CurrentLocationInitial());
     }
   }
 
   // Transitions away from LocationError back to initial
   void clearError() {
-    if (state is LocationError) {
-      emit(const LocationInitial());
+    if (state is CurrentLocationError) {
+      emit(const CurrentLocationInitial());
     }
   }
 }

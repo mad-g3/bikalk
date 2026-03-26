@@ -1,3 +1,5 @@
+import '../../../../../core/domain/bike_mode.dart';
+
 class FareRateEntity {
   const FareRateEntity({
     required this.bikeType,
@@ -7,16 +9,17 @@ class FareRateEntity {
     this.fuelPerKm,
   });
 
-  final String bikeType;
+  final BikeMode bikeType;
   final double pricePerKm;
   final double minPrice;
   final double maxPrice;
   final double? fuelPerKm;
 
-  bool get isElectric => bikeType.toLowerCase() == 'electric';
+  bool get isElectric => bikeType == BikeMode.electric;
 
   // Returns a min/avg/max range estimate for the given distance.
   // Applies a ±15% variance then clamps to the business min/max.
+  // TODO: incorporate wedge fee and any other platform fees once the formula is defined.
   ({double min, double avg, double max}) estimateRange(double distanceKm) {
     final base = pricePerKm * distanceKm;
     final rawMin = base * 0.85;

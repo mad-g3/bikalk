@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
@@ -93,7 +95,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () =>
-                              Navigator.pushNamed(context, '/terms'),
+                              context.go(AppRoutes.termsConditions),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.ctaFill,
                             foregroundColor: AppColors.ctaText,

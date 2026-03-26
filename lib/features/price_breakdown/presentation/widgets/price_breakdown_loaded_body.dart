@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../../../app/routes.dart';
 import '../../../../../app/theme/app_colors.dart';
+import '../../../../../core/domain/bike_mode.dart';
 import '../../../../../app/theme/app_text_styles.dart';
 import '../../application/price_breakdown_state.dart';
 import 'bike_type_badge.dart';
@@ -100,7 +101,7 @@ class PriceBreakdownLoadedBody extends StatelessWidget {
           ),
           if (state.fuelPerKm != null) ...[
             const SizedBox(height: 16),
-            if (state.bikeType.toLowerCase() == 'electric')
+            if (state.bikeType == BikeMode.electric)
               DetailRow(
                 leftLabel: 'charge per km',
                 leftValue: '${state.fuelPerKm!.toStringAsFixed(2)} kWh',

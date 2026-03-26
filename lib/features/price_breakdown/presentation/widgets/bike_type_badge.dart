@@ -12,7 +12,7 @@ class BikeTypeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isElectric = state.bikeType.toLowerCase() == 'electric';
+    final isElectric = state.bikeType == BikeMode.electric;
     return GestureDetector(
       onTap: () {
         context.read<PriceBreakdownCubit>().calculate(

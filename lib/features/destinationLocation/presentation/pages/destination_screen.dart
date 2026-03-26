@@ -23,7 +23,7 @@ class DestinationScreen extends StatefulWidget {
 }
 
 class _DestinationScreenState extends State<DestinationScreen> {
-  static const _defaultLatLng = LatLng(-1.9403, 29.8739);
+  static const _defaultLatLng = LatLng(-1.9403, 29.8739); // Rwanda overview preview
 
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();

@@ -1,20 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 
 class TermsConditionsScreen extends StatelessWidget {
   const TermsConditionsScreen({super.key});
-
-  void _showToast(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: AppColors.ctaFill,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,85 +91,27 @@ class TermsConditionsScreen extends StatelessWidget {
                     // Buttons
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                      child: Column(
-                        children: [
-                          // Agree
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _showToast(context, '✓ Terms Agreed!');
-                                final navigator = Navigator.of(context);
-                                Future.delayed(
-                                  const Duration(milliseconds: 800),
-                                  () => navigator.pushNamedAndRemoveUntil(
-                                    '/',
-                                    (route) => false,
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.ctaFill,
-                                foregroundColor: AppColors.ctaText,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                elevation: 0,
-                              ),
-                              child: const Text(
-                                'Agree',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () => context.go(AppRoutes.home),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.ctaFill,
+                            foregroundColor: AppColors.ctaText,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: const Text(
+                            'Agree',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-
-                          const SizedBox(height: 12),
-
-                          // Disagree
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                _showToast(context, '✗ Terms Declined');
-                                final navigator = Navigator.of(context);
-                                Future.delayed(
-                                  const Duration(milliseconds: 800),
-                                  () => navigator.pushNamedAndRemoveUntil(
-                                    '/',
-                                    (route) => false,
-                                  ),
-                                );
-                              },
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: AppColors.textPrimary,
-                                backgroundColor: AppColors.secondaryFill,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15,
-                                ),
-                                side: const BorderSide(
-                                  color: AppColors.divider,
-                                  width: 1.5,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              child: const Text(
-                                'Disagree',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ],

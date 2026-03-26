@@ -23,8 +23,7 @@ class PriceBreakdownCubit extends Cubit<PriceBreakdownState> {
   }) async {
     emit(const PriceBreakdownLoading());
     try {
-      final bikeType = bikeMode == BikeMode.electric ? 'Electric' : 'Petrol';
-      final rate = await _repository.getFareRateByBikeType(bikeType);
+      final rate = await _repository.getFareRateByBikeType(bikeMode);
 
       if (rate == null) {
         emit(const PriceBreakdownError(
@@ -33,13 +32,15 @@ class PriceBreakdownCubit extends Cubit<PriceBreakdownState> {
         return;
       }
 
+      // distanceBetween uses the Haversine formula — straight-line (as-the-crow-flies)
+      // distance on the Earth's surface, not actual road distance.
       final distanceMeters =
           Geolocator.distanceBetween(fromLat, fromLng, toLat, toLng);
       final distanceKm = distanceMeters / 1000;
       final range = rate.estimateRange(distanceKm);
 
       emit(PriceBreakdownLoaded(
-        bikeType: bikeType,
+        bikeType: bikeMode,
         fromLabel: fromLabel,
         fromLat: fromLat,
         fromLng: fromLng,
