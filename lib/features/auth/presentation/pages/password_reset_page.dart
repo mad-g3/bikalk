@@ -7,6 +7,7 @@ import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../application/auth_cubit.dart';
 import '../../application/auth_state.dart';
+import '../../../../core/widgets/screen_heading.dart';
 import '../widgets/auth_form_field.dart';
 
 class PasswordResetPage extends StatefulWidget {
@@ -43,7 +44,6 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Reset password')),
         body: SafeArea(
           child: BlocBuilder<AuthCubit, AuthState>(
             builder: (context, state) {
@@ -58,14 +58,9 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        'Forgot your password?',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Enter your email and we'll send you a reset link.",
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      const ScreenHeading(
+                        title: 'Forgot your password?',
+                        subtitle: "Enter your email and we'll send you a reset link.",
                       ),
                       const SizedBox(height: 32),
                       AuthFormField(

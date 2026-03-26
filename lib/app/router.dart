@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:bikalk/features/price_breakdown/presentation/pages/price_breakdown_screen.dart' show PriceBreakdownScreenWrapper;
+import 'package:bikalk/features/privacy_policy/presentation/pages/privacy_policy_screen.dart' show PrivacyPolicyScreen;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../features/destinationLocation/presentation/pages/destination_screen.dart';
@@ -12,6 +14,7 @@ import '../features/auth/presentation/pages/sign_up_page.dart';
 import '../features/splash/presentation/pages/splash_page.dart';
 import '../features/auth/presentation/pages/verify_email_page.dart';
 import '../features/feedback/presentation/pages/feedback_page.dart';
+import '../features/terms_conditions/presentation/pages/terms_conditions_screen.dart';
 import '../features/current_location/presentation/screens/current_location_screen.dart';
 import '../features/report_problem/presentation/pages/report_problem_page.dart';
 import 'di.dart';
@@ -74,12 +77,12 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.privacyPolicy,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: PrivacyPolicyScreen ()),
       ),
       GoRoute(
         path: AppRoutes.termsConditions,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: TermsConditionsScreen()),
       ),
 
       // Core flow
@@ -101,7 +104,7 @@ GoRouter buildRouter() {
       GoRoute(
         path: AppRoutes.priceBreakdown,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: Placeholder()),
+            const NoTransitionPage(child: PriceBreakdownScreenWrapper()),
       ),
 
       // Post-result

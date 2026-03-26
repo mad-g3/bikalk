@@ -21,7 +21,7 @@ class FeedbackRepository implements IFeedbackRepository {
       final model = FeedbackModel(
         description: trimmed,
         userId: source.currentUserId,
-        category: 'feedback',
+        type: 'feedback',
       );
       await source.saveFeedback(model);
       return (true, null);

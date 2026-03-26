@@ -85,26 +85,20 @@ class _SplashPageState extends State<SplashPage>
                 ),
               );
             },
-            child: Center(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 48),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo
-                  Image.asset(
-                    'assets/images/logo.png',
-                    height: 140,
-                  ),
-                  const SizedBox(height: 20),
-                  // App name
-                  Text(
-                    'Bikalk',
-                    style: AppTextStyles.displayLarge.copyWith(
-                      color: AppColors.brandRose,
-                      letterSpacing: 1.2,
+                  // Logo centred in the upper space
+                  Expanded(
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        height: 182,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  // Tagline
+                  // Tagline + spinner pinned to bottom
                   Text(
                     'Transparent Pricing is Peace of mind',
                     textAlign: TextAlign.center,
@@ -113,8 +107,7 @@ class _SplashPageState extends State<SplashPage>
                       letterSpacing: 0.3,
                     ),
                   ),
-                  const SizedBox(height: 48),
-                  // Loading indicator
+                  const SizedBox(height: 32),
                   SizedBox(
                     width: 20,
                     height: 20,

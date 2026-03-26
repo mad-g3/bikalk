@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/di.dart';
+import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../application/report_problem_cubit.dart';
@@ -60,12 +62,18 @@ class _ReportProblemViewState extends State<_ReportProblemView> {
           );
         }
 
-        final message = state.errorMessage ?? state.successMessage;
-        if (message != null) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(message)));
+        if (state.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage!)),
+          );
           context.read<ReportProblemCubit>().clearMessages();
+        }
+
+        if (state.successMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.successMessage!)),
+          );
+          context.go(AppRoutes.home);
         }
       },
       builder: (context, state) {
@@ -148,7 +156,7 @@ class _ReportProblemViewState extends State<_ReportProblemView> {
                   OutlinedButton(
                     onPressed: state.isSubmitting
                         ? null
-                        : () => Navigator.of(context).maybePop(),
+                        : () => context.go(AppRoutes.home),
                     child: const Text('Cancel'),
                   ),
                 ],

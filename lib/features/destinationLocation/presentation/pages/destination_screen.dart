@@ -8,8 +8,9 @@ import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/widgets/continue_button.dart';
+import '../../../../core/widgets/screen_heading.dart';
 import '../../../current_location/domain/entities/location_entity.dart';
-import '../../../current_location/presentation/widgets/location_suggestion_list.dart';
+import '../../../current_location/presentation/widgets/location_suggestions_overlay.dart';
 import '../../application/destination_location_cubit.dart';
 import '../../application/destination_location_state.dart';
 import '../widgets/destination_search_field.dart';
@@ -26,7 +27,13 @@ class _DestinationScreenState extends State<DestinationScreen> {
 
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
+  final _searchFieldKey = GlobalKey();
+  final _stackKey = GlobalKey();
   GoogleMapController? _mapController;
+
+  // Tracks when the camera has already been moved by a direct handler
+  // so the BlocListener doesn't double-animate it.
+  bool _cameraHandled = false;
 
   @override
   void initState() {
@@ -46,7 +53,6 @@ class _DestinationScreenState extends State<DestinationScreen> {
 
   void _onFocusChanged() {
     if (!_focusNode.hasFocus && mounted) {
-      // Small delay so suggestion tap handlers fire before results are cleared
       Future<void>.delayed(const Duration(milliseconds: 120), () {
         if (!mounted || _focusNode.hasFocus) return;
         context.read<DestinationLocationCubit>().clearSearchResults();
@@ -62,17 +68,25 @@ class _DestinationScreenState extends State<DestinationScreen> {
     );
   }
 
+  Future<void> _panTo(LatLng target) async {
+    await _mapController?.animateCamera(CameraUpdate.newLatLng(target));
+  }
+
   void _onSuggestionSelected(LocationEntity location) {
     _searchController.text = location.primaryLabel;
+    _cameraHandled = true;
     context.read<DestinationLocationCubit>().selectFromSuggestion(location);
+    _flyTo(LatLng(location.latitude, location.longitude));
     FocusScope.of(context).unfocus();
   }
 
   void _onMapLongPress(LatLng latLng) {
+    _cameraHandled = true;
     context.read<DestinationLocationCubit>().selectFromMapPin(
-      latLng.latitude,
-      latLng.longitude,
-    );
+          latLng.latitude,
+          latLng.longitude,
+        );
+    _panTo(latLng);
   }
 
   @override
@@ -81,8 +95,11 @@ class _DestinationScreenState extends State<DestinationScreen> {
       listenWhen: (_, curr) => curr is DestinationLocationSelected,
       listener: (context, state) {
         if (state is DestinationLocationSelected) {
-          _flyTo(LatLng(state.lat, state.lng));
-          // Sync text field for map pin selections; suggestions set it in _onSuggestionSelected
+          if (_cameraHandled) {
+            _cameraHandled = false;
+          } else {
+            _flyTo(LatLng(state.lat, state.lng));
+          }
           if (_searchController.text.isEmpty) {
             _searchController.text = state.displayName;
           }
@@ -104,95 +121,88 @@ class _DestinationScreenState extends State<DestinationScreen> {
           resizeToAvoidBottomInset: false,
           backgroundColor: AppColors.scaffoldBg,
           body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.arrow_back, size: 30),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Destination',
-                    style: AppTextStyles.titleLarge.copyWith(fontSize: 38),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Where do you want to go?',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  DestinationSearchField(
-                    controller: _searchController,
-                    focusNode: _focusNode,
-                    isSearching: isSearching,
-                    onChanged: (q) =>
-                        context.read<DestinationLocationCubit>().scheduleSearch(q),
-                  ),
-                  if (suggestions.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    LocationSuggestionList(
-                      suggestions: suggestions,
-                      onSelected: _onSuggestionSelected,
-                    ),
-                  ],
-                  const SizedBox(height: 18),
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: GoogleMap(
-                        initialCameraPosition: const CameraPosition(
-                          target: _defaultLatLng,
-                          zoom: 8,
-                        ),
-                        myLocationButtonEnabled: false,
-                        mapToolbarEnabled: false,
-                        zoomControlsEnabled: false,
-                        onMapCreated: (controller) {
-                          _mapController = controller;
-                          if (markerLatLng != null) {
-                            _flyTo(markerLatLng);
-                          }
-                        },
-                        markers: markerLatLng == null
-                            ? const <Marker>{}
-                            : {
-                                Marker(
-                                  markerId: const MarkerId('destination'),
-                                  position: markerLatLng,
-                                ),
+            child: Stack(
+              key: _stackKey,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                  child: Column(
+                    children: [
+                      const ScreenHeading(
+                        title: 'Destination',
+                        subtitle: 'Where do you want to go?',
+                      ),
+                      const SizedBox(height: 22),
+                      DestinationSearchField(
+                        key: _searchFieldKey,
+                        controller: _searchController,
+                        focusNode: _focusNode,
+                        isSearching: isSearching,
+                        onChanged: (q) => context
+                            .read<DestinationLocationCubit>()
+                            .scheduleSearch(q),
+                      ),
+                      const SizedBox(height: 18),
+                      Expanded(
+                        child: RepaintBoundary(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: GoogleMap(
+                              initialCameraPosition: const CameraPosition(
+                                target: _defaultLatLng,
+                                zoom: 8,
+                              ),
+                              myLocationButtonEnabled: false,
+                              mapToolbarEnabled: false,
+                              zoomControlsEnabled: false,
+                              onMapCreated: (controller) {
+                                _mapController = controller;
+                                if (markerLatLng != null) {
+                                  _flyTo(markerLatLng);
+                                }
                               },
-                        onLongPress: _onMapLongPress,
+                              markers: markerLatLng == null
+                                  ? const <Marker>{}
+                                  : {
+                                      Marker(
+                                        markerId:
+                                            const MarkerId('destination'),
+                                        position: markerLatLng,
+                                      ),
+                                    },
+                              onLongPress: _onMapLongPress,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Long press to change the destination',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textHint,
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Long press to change the destination',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textHint,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 20),
+                      ContinueButton(
+                        onPressed: state is DestinationLocationSelected
+                            ? () => context.push(AppRoutes.currentLocation)
+                            : null,
+                        label: 'Continue',
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                  ContinueButton(
-                    onPressed: state is DestinationLocationSelected
-                        ? () => context.push(AppRoutes.currentLocation)
-                        : null,
-                    label: 'Continue',
+                ),
+                if (suggestions.isNotEmpty)
+                  LocationSuggestionsOverlay(
+                    anchorKey: _searchFieldKey,
+                    stackKey: _stackKey,
+                    suggestions: suggestions,
+                    onSelected: _onSuggestionSelected,
                   ),
-                ],
-              ),
+              ],
             ),
           ),
         );
