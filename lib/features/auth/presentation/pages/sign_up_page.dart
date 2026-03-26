@@ -24,6 +24,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final _phoneCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   bool _obscurePassword = true;
+  bool _agreedToTerms = false;
 
   @override
   void dispose() {
@@ -128,31 +129,44 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Wrap(
-                        alignment: WrapAlignment.start,
-                        crossAxisAlignment: WrapCrossAlignment.center,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Text('By signing up you agree to our '),
-                          TextButton(
-                            onPressed: () =>
-                                context.push(AppRoutes.termsConditions),
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                            child: const Text('Terms'),
+                          Checkbox(
+                            value: _agreedToTerms,
+                            onChanged: (v) =>
+                                setState(() => _agreedToTerms = v ?? false),
                           ),
-                          const Text(' & '),
-                          TextButton(
-                            onPressed: () =>
-                                context.push(AppRoutes.privacyPolicy),
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          Expanded(
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                const Text('I agree to the '),
+                                TextButton(
+                                  onPressed: () =>
+                                      context.push(AppRoutes.termsConditions),
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: const Text('Terms'),
+                                ),
+                                const Text(' & '),
+                                TextButton(
+                                  onPressed: () =>
+                                      context.push(AppRoutes.privacyPolicy),
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: const Text('Privacy Policy'),
+                                ),
+                              ],
                             ),
-                            child: const Text('Privacy Policy'),
                           ),
                         ],
                       ),
@@ -161,7 +175,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         const AppLoadingIndicator()
                       else
                         ElevatedButton(
-                          onPressed: _submit,
+                          onPressed: _agreedToTerms ? _submit : null,
                           child: const Text('Create account'),
                         ),
                       const SizedBox(height: 16),
