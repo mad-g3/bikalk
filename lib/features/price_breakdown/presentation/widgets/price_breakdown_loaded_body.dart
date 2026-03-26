@@ -6,6 +6,7 @@ import '../../../../../app/routes.dart';
 import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_text_styles.dart';
 import '../../application/price_breakdown_state.dart';
+import 'bike_type_badge.dart';
 import 'detail_row.dart';
 
 class PriceBreakdownLoadedBody extends StatelessWidget {
@@ -53,30 +54,9 @@ class PriceBreakdownLoadedBody extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Bike type badge
           Align(
             alignment: Alignment.centerLeft,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-              decoration: BoxDecoration(
-                color: state.bikeType.toLowerCase() == 'electric'
-                    ? const Color(0xFFE8F5E9)
-                    : const Color(0xFFFFF3E0),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                state.bikeType.toLowerCase() == 'electric'
-                    ? 'Electric'
-                    : 'Petrol',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: state.bikeType.toLowerCase() == 'electric'
-                      ? const Color(0xFF388E3C)
-                      : const Color(0xFFE65100),
-                ),
-              ),
-            ),
+            child: BikeTypeBadge(state: state),
           ),
 
           const SizedBox(height: 8),
@@ -120,13 +100,22 @@ class PriceBreakdownLoadedBody extends StatelessWidget {
           ),
           if (state.fuelPerKm != null) ...[
             const SizedBox(height: 16),
-            DetailRow(
-              leftLabel: 'fuel per km',
-              leftValue: '${state.fuelPerKm!.toStringAsFixed(2)} L',
-              rightLabel: 'total fuel',
-              rightValue:
-                  '${(state.fuelPerKm! * state.distanceKm).toStringAsFixed(2)} L',
-            ),
+            if (state.bikeType.toLowerCase() == 'electric')
+              DetailRow(
+                leftLabel: 'charge per km',
+                leftValue: '${state.fuelPerKm!.toStringAsFixed(2)} kWh',
+                rightLabel: 'total charge',
+                rightValue:
+                    '${(state.fuelPerKm! * state.distanceKm).toStringAsFixed(2)} kWh',
+              )
+            else
+              DetailRow(
+                leftLabel: 'fuel per km',
+                leftValue: '${state.fuelPerKm!.toStringAsFixed(2)} L',
+                rightLabel: 'total fuel',
+                rightValue:
+                    '${(state.fuelPerKm! * state.distanceKm).toStringAsFixed(2)} L',
+              ),
           ],
 
           const SizedBox(height: 24),

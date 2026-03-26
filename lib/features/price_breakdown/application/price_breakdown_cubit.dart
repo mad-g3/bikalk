@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../../features/homeScreen/domain/value_objects/bike_mode.dart';
+import '../../../core/domain/bike_mode.dart';
 import '../domain/repositories/i_fare_repository.dart';
 import 'price_breakdown_state.dart';
 

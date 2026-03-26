@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../domain/value_objects/bike_mode.dart';
+import '../../../../core/domain/bike_mode.dart';
 
 abstract class BikeSelectionState extends Equatable {
   const BikeSelectionState();

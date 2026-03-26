@@ -12,7 +12,7 @@ import '../../application/location_cubit.dart';
 import '../../application/location_state.dart';
 import '../../domain/entities/location_entity.dart';
 import '../widgets/location_search_field.dart';
-import '../widgets/location_suggestion_list.dart';
+import '../widgets/location_suggestions_overlay.dart';
 
 class CurrentLocationScreen extends StatefulWidget {
   const CurrentLocationScreen({super.key});
@@ -22,11 +22,16 @@ class CurrentLocationScreen extends StatefulWidget {
 }
 
 class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
-  static const _defaultLatLng = LatLng(-1.9403, 29.8739); // Rwanda overview
+  static const _defaultLatLng = LatLng(-1.9403, 29.8739);
 
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
+  // Global keys to track the positions of text fields at runtime
+  final _searchFieldKey = GlobalKey();
+  final _stackKey = GlobalKey();
   GoogleMapController? _mapController;
+
+  bool _cameraHandled = false;
 
   @override
   void initState() {
@@ -62,17 +67,25 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
     );
   }
 
+  Future<void> _panTo(LatLng target) async {
+    await _mapController?.animateCamera(CameraUpdate.newLatLng(target));
+  }
+
   void _onSuggestionSelected(LocationEntity location) {
     _searchController.text = location.primaryLabel;
+    _cameraHandled = true;
     context.read<LocationCubit>().selectLocation(location);
+    _flyTo(LatLng(location.latitude, location.longitude));
     FocusScope.of(context).unfocus();
   }
 
   void _onMapLongPress(LatLng position) {
+    _cameraHandled = true;
     context.read<LocationCubit>().pinLocation(
-      position.latitude,
-      position.longitude,
-    );
+          position.latitude,
+          position.longitude,
+        );
+    _panTo(position);
   }
 
   @override
@@ -82,16 +95,19 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
           curr is LocationSelected || curr is LocationError,
       listener: (context, state) {
         if (state is LocationSelected) {
-          _flyTo(LatLng(state.lat, state.lng));
-          // Sync text field for GPS/map-pin selections; suggestions set it in _onSuggestionSelected
+          if (_cameraHandled) {
+            _cameraHandled = false;
+          } else {
+            // GPS detect — fly in with zoom
+            _flyTo(LatLng(state.lat, state.lng));
+          }
           if (_searchController.text.isEmpty) {
             _searchController.text = state.displayName;
           }
         }
         if (state is LocationError) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.message)));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(state.message)));
           context.read<LocationCubit>().clearError();
         }
       },
@@ -100,8 +116,8 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
             ? LatLng(state.lat, state.lng)
             : null;
 
-        final isSearching = state is LocationSearchResults && state.isSearching;
-
+        final isSearching =
+            state is LocationSearchResults && state.isSearching;
         final isDetecting = state is LocationDetecting;
 
         final suggestions = state is LocationSearchResults
@@ -111,84 +127,93 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
         return Scaffold(
           resizeToAvoidBottomInset: false,
           body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-              child: Column(
-                children: [
-                  const ScreenHeading(
-                    title: 'Location',
-                    subtitle: 'Where are you now?',
-                  ),
-                  const SizedBox(height: 22),
-                  LocationSearchField(
-                    controller: _searchController,
-                    focusNode: _focusNode,
-                    onChanged: (q) =>
-                        context.read<LocationCubit>().scheduleSearch(q),
-                    onDetectLocation: () =>
-                        context.read<LocationCubit>().detectLocation(),
-                    isSearching: isSearching,
-                    isDetecting: isDetecting,
-                  ),
-                  if (suggestions.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    LocationSuggestionList(
-                      suggestions: suggestions,
-                      onSelected: _onSuggestionSelected,
-                    ),
-                  ],
-                  const SizedBox(height: 18),
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: GoogleMap(
-                        initialCameraPosition: const CameraPosition(
-                          target: _defaultLatLng,
-                          zoom: 8,
-                        ),
-                        myLocationButtonEnabled: false,
-                        mapToolbarEnabled: false,
-                        zoomControlsEnabled: false,
-                        onMapCreated: (controller) {
-                          _mapController = controller;
-                          if (markerLatLng != null) {
-                            _flyTo(markerLatLng);
-                          }
-                        },
-                        markers: markerLatLng == null
-                            ? const <Marker>{}
-                            : {
-                                Marker(
-                                  markerId: const MarkerId('current-location'),
-                                  position: markerLatLng,
-                                ),
+            child: Stack(
+              key: _stackKey,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                  child: Column(
+                    children: [
+                      const ScreenHeading(
+                        title: 'Location',
+                        subtitle: 'Where are you now?',
+                      ),
+                      const SizedBox(height: 22),
+                      LocationSearchField(
+                        key: _searchFieldKey,
+                        controller: _searchController,
+                        focusNode: _focusNode,
+                        onChanged: (q) =>
+                            context.read<LocationCubit>().scheduleSearch(q),
+                        onDetectLocation: () =>
+                            context.read<LocationCubit>().detectLocation(),
+                        isSearching: isSearching,
+                        isDetecting: isDetecting,
+                      ),
+                      const SizedBox(height: 18),
+                      Expanded(
+                        child: RepaintBoundary(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: GoogleMap(
+                              initialCameraPosition: const CameraPosition(
+                                target: _defaultLatLng,
+                                zoom: 8,
+                              ),
+                              myLocationButtonEnabled: false,
+                              mapToolbarEnabled: false,
+                              zoomControlsEnabled: false,
+                              onMapCreated: (controller) {
+                                _mapController = controller;
+                                if (markerLatLng != null) {
+                                  _flyTo(markerLatLng);
+                                }
                               },
-                        onLongPress: _onMapLongPress,
+                              markers: markerLatLng == null
+                                  ? const <Marker>{}
+                                  : {
+                                      Marker(
+                                        markerId:
+                                            const MarkerId('current-location'),
+                                        position: markerLatLng,
+                                      ),
+                                    },
+                              onLongPress: _onMapLongPress,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Long press to change the location',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textHint,
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Long press to change the location',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textHint,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: state is LocationSelected
+                              ? () => context.push(AppRoutes.priceBreakdown)
+                              : null,
+                          child: const Text('Calculate'),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: state is LocationSelected
-                          ? () => context.push(AppRoutes.priceBreakdown)
-                          : null,
-                      child: const Text('Calculate'),
-                    ),
+                ),
+                if (suggestions.isNotEmpty)
+                  LocationSuggestionsOverlay(
+                    anchorKey: _searchFieldKey,
+                    stackKey: _stackKey,
+                    suggestions: suggestions,
+                    onSelected: _onSuggestionSelected,
                   ),
-                ],
-              ),
+              ],
             ),
           ),
         );

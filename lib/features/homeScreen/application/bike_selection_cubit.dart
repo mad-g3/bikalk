@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../domain/value_objects/bike_mode.dart';
+import '../../../../core/domain/bike_mode.dart';
 import 'bike_selection_state.dart';
 
 class BikeSelectionCubit extends Cubit<BikeSelectionState> {

@@ -10,7 +10,7 @@ import '../../../../app/routes.dart';
 import 'package:go_router/go_router.dart';
 import '../../application/bike_selection_cubit.dart';
 import '../../application/bike_selection_state.dart';
-import '../../domain/value_objects/bike_mode.dart';
+import '../../../../core/domain/bike_mode.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
