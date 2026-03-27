@@ -19,5 +19,5 @@ class AppRoutes {
 
   // Post-result
   static const reportProblem = '/report-problem';
-  static const feedback = '/feedback';
+  
 }
