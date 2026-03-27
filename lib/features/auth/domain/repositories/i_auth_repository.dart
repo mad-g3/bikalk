@@ -21,5 +21,7 @@ abstract class IAuthRepository {
 
   Future<(UserEntity?, Failure?)> getCurrentUser();
 
+  Future<(UserEntity?, Failure?)> signInWithGoogle();
+
   Future<(bool, Failure?)> signOut();
 }

@@ -12,7 +12,12 @@
           "package_name": "com.example.bikalk"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "329560075303-gcgp8chjnigotr5gdb3ndalrgnn5h9oq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDmyYLwnkmTE3TYl4I6iUjPLgONh9Rm9sc"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "329560075303-gcgp8chjnigotr5gdb3ndalrgnn5h9oq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "329560075303-aunsm2aq6r2u8se6l9i3rp9goqva3sos.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.bikalk"
+              }
+            }
+          ]
         }
       }
     }

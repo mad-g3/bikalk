@@ -62,6 +62,21 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AwaitingEmailVerification(user!));
   }
 
+  Future<void> signInWithGoogle() async {
+    emit(const AuthLoading());
+    final (user, failure) = await _repository.signInWithGoogle();
+    if (failure != null) {
+      emit(AuthError(failure.message));
+      return;
+    }
+    if (user == null) {
+      emit(AuthError('Unable to sign in with Google. Please try again.'));
+      return;
+    }
+    // Google accounts are always email-verified
+    emit(Authenticated(user));
+  }
+
   // Polls Firebase to see if user has verified their email
   Future<void> checkEmailVerified() async {
     final (user, failure) = await _repository.getCurrentUser();

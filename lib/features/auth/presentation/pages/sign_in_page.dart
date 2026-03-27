@@ -112,11 +112,35 @@ class _SignInPageState extends State<SignInPage> {
                       const SizedBox(height: 24),
                       if (loading)
                         const AppLoadingIndicator()
-                      else
+                      else ...[
                         ElevatedButton(
                           onPressed: _submit,
                           child: const Text('Sign in'),
                         ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            const Expanded(child: Divider()),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              child: Text(
+                                'or',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ),
+                            const Expanded(child: Divider()),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        OutlinedButton.icon(
+                          onPressed: () =>
+                              context.read<AuthCubit>().signInWithGoogle(),
+                          icon: const Icon(Icons.g_mobiledata, size: 24),
+                          label: const Text('Continue with Google'),
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

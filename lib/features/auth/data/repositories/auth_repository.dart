@@ -114,6 +114,29 @@ class AuthRepository implements IAuthRepository {
   }
 
   @override
+  Future<(UserEntity?, Failure?)> signInWithGoogle() async {
+    try {
+      final credential = await authSource.signInWithGoogle();
+      final firebase = credential.user;
+      if (firebase == null) {
+        return (null, AuthFailure('Google sign-in failed. Please try again.'));
+      }
+
+      final stored = await userSource.getUser(firebase.uid);
+      if (stored != null) return (stored.toEntity(), null);
+
+      // First-time Google sign-in — save user to Firestore
+      final model = UserModel.fromFirebaseUser(firebase);
+      await userSource.saveUser(model);
+      return (model.toEntity(), null);
+    } on FirebaseAuthException catch (e) {
+      return (null, AuthFailure(_authMessage(e.code)));
+    } catch (_) {
+      return (null, const AuthFailure());
+    }
+  }
+
+  @override
   Future<(bool, Failure?)> signOut() async {
     try {
       await authSource.signOut();
@@ -134,6 +157,7 @@ class AuthRepository implements IAuthRepository {
       'invalid-email' => 'Enter a valid email address.',
       'too-many-requests' => 'Too many attempts. Try again later.',
       'network-request-failed' => 'Check your internet connection.',
+      'google-sign-in-cancelled' => 'Google sign-in was cancelled.',
       _ => 'An authentication error occurred.',
     };
   }
