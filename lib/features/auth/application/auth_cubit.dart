@@ -102,7 +102,8 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> signOut() async {
-    await _repository.signOut();
+    // redirect immediately; don't wait on Firebase
     emit(const Unauthenticated());
+    await _repository.signOut();
   }
 }

@@ -73,15 +73,16 @@ class ProfileCubit extends Cubit<ProfileState> {
     }
     emit(ProfileLoading());
     try {
-      await currentUser.delete();
+      // Firestore first — user is still authenticated
       await _userSource.deleteUser(uid);
+      // Auth last — signing out invalidates the token
+      await currentUser.delete();
       emit(ProfileDeleted());
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'requires-recent-login') {
-        emit(ProfileError('requires-recent-login'));
-      } else {
-        emit(ProfileError(e.message ?? e.toString()));
-      }
+      final msg = e.code == 'requires-recent-login'
+          ? 'Please sign out and sign back in, then try deleting again.'
+          : (e.message ?? e.toString());
+      emit(ProfileError(msg));
     } catch (e) {
       emit(ProfileError(e.toString()));
     }
