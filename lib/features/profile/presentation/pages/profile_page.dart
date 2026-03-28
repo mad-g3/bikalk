@@ -135,7 +135,7 @@ class _ProfilePageState extends State<ProfilePage> {
         } else if (state is ProfileError) {
           AppSnackBar.error(context, state.message);
         } else if (state is ProfileDeleted) {
-          context.go(AppRoutes.signIn);
+          sl<AuthCubit>().signOut();
         }
       },
       builder: (context, state) {
