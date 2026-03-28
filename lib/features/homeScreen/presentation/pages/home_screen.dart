@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../app/di.dart';
 import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -15,28 +14,8 @@ import '../../application/bike_selection_state.dart';
 import '../widgets/bike_selection_card.dart';
 import '../widgets/safety_section.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _applyPreferredBikeMode();
-  }
-
-  Future<void> _applyPreferredBikeMode() async {
-    // Only apply the preference if the user hasn't made a selection yet
-    if (sl<BikeSelectionCubit>().state is BikeSelectionUpdated) return;
-    final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString('preferred_bike_mode') ?? 'electric';
-    final mode = saved == 'petrol' ? BikeMode.petrol : BikeMode.electric;
-    sl<BikeSelectionCubit>().selectMode(mode);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,8 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ? state.user.name[0].toUpperCase()
                                   : '?';
                               return CircleAvatar(
-                                radius: 14,
-                                backgroundColor: AppColors.ctaFill,
+                                radius: 16,
+                                backgroundColor: AppColors.brandRose,
                                 child: Text(
                                   initial,
                                   style: const TextStyle(color: Colors.white),

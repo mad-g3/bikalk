@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart' show GoogleSignIn;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../core/services/preferences_service.dart';
 import '../features/auth/application/auth_cubit.dart';
 import '../features/auth/data/repositories/auth_repository.dart';
 import '../features/auth/data/sources/firebase_auth_source.dart';
@@ -29,6 +31,10 @@ import '../features/report_problem/domain/repositories/i_problem_report_reposito
 final GetIt sl = GetIt.instance;
 
 Future<void> setupDi() async {
+  // SharedPreferences — must be awaited before anything that depends on it
+  final prefs = await SharedPreferences.getInstance();
+  sl.registerLazySingleton<PreferencesService>(() => PreferencesService(prefs));
+
   // Firebase SDKs
   sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
@@ -98,7 +104,7 @@ Future<void> setupDi() async {
   );
 
   // Bike selection cubit
-  sl.registerLazySingleton(() => BikeSelectionCubit());
+  sl.registerLazySingleton(() => BikeSelectionCubit(sl<PreferencesService>()));
 
   // Fare rate repository
   sl.registerLazySingleton<IFareRepository>(

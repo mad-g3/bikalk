@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../app/di.dart';
 import '../../../../app/routes.dart';
-import '../../../../core/domain/bike_mode.dart';
-import '../../../../features/homeScreen/application/bike_selection_cubit.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/domain/bike_mode.dart';
+import '../../../../core/services/preferences_service.dart';
+import '../../../../features/homeScreen/application/bike_selection_cubit.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/screen_heading.dart';
@@ -19,9 +19,6 @@ import '../widgets/profile_action_row.dart';
 import '../widgets/profile_preference_row.dart';
 import '../widgets/profile_section_label.dart';
 import '../widgets/profile_toggle_row.dart';
-
-const _kBikeMode = 'preferred_bike_mode';
-const _kDistanceUnit = 'distance_unit';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -48,26 +45,24 @@ class _ProfilePageState extends State<ProfilePage> {
     super.dispose();
   }
 
-  Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
+  void _loadPreferences() {
+    final svc = sl<PreferencesService>();
     setState(() {
-      _bikeMode = prefs.getString(_kBikeMode) ?? 'electric';
-      _distanceUnit = prefs.getString(_kDistanceUnit) ?? 'km';
+      _bikeMode = svc.getBikeMode() == BikeMode.petrol ? 'petrol' : 'electric';
+      _distanceUnit = svc.getDistanceUnit();
     });
   }
 
   Future<void> _saveBikeMode(String value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kBikeMode, value);
-    setState(() => _bikeMode = value);
-    // Keep the home screen cubit in sync so the selection updates immediately
     final mode = value == 'petrol' ? BikeMode.petrol : BikeMode.electric;
+    await sl<PreferencesService>().saveBikeMode(mode);
+    // selectMode persists via PreferencesService internally, so no double-write
     sl<BikeSelectionCubit>().selectMode(mode);
+    setState(() => _bikeMode = value);
   }
 
   Future<void> _saveDistanceUnit(String value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kDistanceUnit, value);
+    await sl<PreferencesService>().saveDistanceUnit(value);
     setState(() => _distanceUnit = value);
   }
 

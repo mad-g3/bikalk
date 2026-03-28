@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../../app/di.dart';
 import '../../../../../app/routes.dart';
+import '../../../../../core/services/preferences_service.dart';
 import '../../../../../app/theme/app_colors.dart';
 import '../../../../../app/theme/app_text_styles.dart';
 import '../../../../../core/domain/bike_mode.dart';
+import '../../../../core/widgets/continue_button.dart';
 import '../../application/price_breakdown_state.dart';
 import 'bike_type_badge.dart';
 import 'detail_row.dart';
@@ -27,14 +29,7 @@ class _PriceBreakdownLoadedBodyState extends State<PriceBreakdownLoadedBody> {
   @override
   void initState() {
     super.initState();
-    _loadDistanceUnit();
-  }
-
-  Future<void> _loadDistanceUnit() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (mounted) {
-      setState(() => _useMiles = prefs.getString('distance_unit') == 'mi');
-    }
+    _useMiles = sl<PreferencesService>().getDistanceUnit() == 'mi';
   }
 
   @override
@@ -59,7 +54,7 @@ class _PriceBreakdownLoadedBodyState extends State<PriceBreakdownLoadedBody> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(
-            height: 180,
+            height: 200,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: GoogleMap(
@@ -150,21 +145,9 @@ class _PriceBreakdownLoadedBodyState extends State<PriceBreakdownLoadedBody> {
 
           const SizedBox(height: 24),
 
-          ElevatedButton(
+          ContinueButton(
             onPressed: () => context.go(AppRoutes.feedback),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.ctaFill,
-              foregroundColor: AppColors.ctaText,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              elevation: 0,
-            ),
-            child: const Text(
-              'All Good',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-            ),
+            label: 'All Good',
           ),
           const SizedBox(height: 12),
           OutlinedButton(
