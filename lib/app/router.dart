@@ -16,6 +16,7 @@ import '../features/auth/presentation/pages/verify_email_page.dart';
 import '../features/feedback/presentation/pages/feedback_page.dart';
 import '../features/terms_conditions/presentation/pages/terms_conditions_screen.dart';
 import '../features/current_location/presentation/screens/current_location_screen.dart';
+import '../features/profile/presentation/pages/profile_page.dart';
 import '../features/report_problem/presentation/pages/report_problem_page.dart';
 import 'di.dart';
 import 'routes.dart';
@@ -85,6 +86,12 @@ GoRouter buildRouter() {
             const NoTransitionPage(child: TermsConditionsScreen()),
       ),
 
+      GoRoute(
+        path: AppRoutes.profile,
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: ProfilePageWrapper()),
+      ),
+
       // Core flow
       GoRoute(
         path: AppRoutes.home,
@@ -124,6 +131,7 @@ GoRouter buildRouter() {
 
 const _protectedRoutes = [
   AppRoutes.home,
+  AppRoutes.profile,
   AppRoutes.currentLocation,
   AppRoutes.destinationLocation,
   AppRoutes.priceBreakdown,

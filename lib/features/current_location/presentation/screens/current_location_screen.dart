@@ -1,3 +1,4 @@
+import 'package:bikalk/core/widgets/continue_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -26,6 +27,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
 
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
+
   // Global keys to track the positions of text fields at runtime
   final _searchFieldKey = GlobalKey();
   final _stackKey = GlobalKey();
@@ -82,9 +84,9 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   void _onMapLongPress(LatLng position) {
     _cameraHandled = true;
     context.read<LocationCubit>().pinLocation(
-          position.latitude,
-          position.longitude,
-        );
+      position.latitude,
+      position.longitude,
+    );
     _panTo(position);
   }
 
@@ -106,8 +108,9 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
           }
         }
         if (state is CurrentLocationError) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(state.message)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
           context.read<LocationCubit>().clearError();
         }
       },
@@ -173,8 +176,9 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
                                   ? const <Marker>{}
                                   : {
                                       Marker(
-                                        markerId:
-                                            const MarkerId('current-location'),
+                                        markerId: const MarkerId(
+                                          'current-location',
+                                        ),
                                         position: markerLatLng,
                                       ),
                                     },
@@ -194,14 +198,11 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: state is CurrentLocationSelected
-                              ? () => context.push(AppRoutes.priceBreakdown)
-                              : null,
-                          child: const Text('Calculate'),
-                        ),
+                      ContinueButton(
+                        onPressed: state is CurrentLocationSelected
+                            ? () => context.push(AppRoutes.priceBreakdown)
+                            : null,
+                        label: 'Calculate',
                       ),
                     ],
                   ),

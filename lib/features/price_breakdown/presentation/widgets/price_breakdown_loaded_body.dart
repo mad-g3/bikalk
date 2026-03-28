@@ -2,31 +2,59 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../../../app/di.dart';
 import '../../../../../app/routes.dart';
+import '../../../../../core/services/preferences_service.dart';
 import '../../../../../app/theme/app_colors.dart';
-import '../../../../../core/domain/bike_mode.dart';
 import '../../../../../app/theme/app_text_styles.dart';
+import '../../../../../core/domain/bike_mode.dart';
+import '../../../../core/widgets/continue_button.dart';
 import '../../application/price_breakdown_state.dart';
 import 'bike_type_badge.dart';
 import 'detail_row.dart';
 
-class PriceBreakdownLoadedBody extends StatelessWidget {
+class PriceBreakdownLoadedBody extends StatefulWidget {
   const PriceBreakdownLoadedBody({super.key, required this.state});
 
   final PriceBreakdownLoaded state;
 
   @override
+  State<PriceBreakdownLoadedBody> createState() =>
+      _PriceBreakdownLoadedBodyState();
+}
+
+class _PriceBreakdownLoadedBodyState extends State<PriceBreakdownLoadedBody> {
+  bool _useMiles = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _useMiles = sl<PreferencesService>().getDistanceUnit() == 'mi';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final midLat = (state.fromLat + state.toLat) / 2;
-    final midLng = (state.fromLng + state.toLng) / 2;
+    final s = widget.state;
+    final unitLabel = _useMiles ? 'mi' : 'km';
+
+    // Display-only conversions (raw data always stored in km)
+    final distanceDisplay = _useMiles ? s.distanceKm * 0.621371 : s.distanceKm;
+    final rateDisplay = _useMiles ? s.pricePerKm * 1.60934 : s.pricePerKm;
+    final fuelPerUnitDisplay = s.fuelPerKm != null
+        ? (s.fuelPerKm! * (_useMiles ? 1.60934 : 1))
+        : null;
+    // Total consumption is a physical quantity — unchanged by unit display
+    final totalFuel = s.fuelPerKm != null ? s.fuelPerKm! * s.distanceKm : null;
+
+    final midLat = (s.fromLat + s.toLat) / 2;
+    final midLng = (s.fromLng + s.toLng) / 2;
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Map with from + to markers
           SizedBox(
-            height: 180,
+            height: 200,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: GoogleMap(
@@ -40,12 +68,12 @@ class PriceBreakdownLoadedBody extends StatelessWidget {
                 markers: {
                   Marker(
                     markerId: const MarkerId('from'),
-                    position: LatLng(state.fromLat, state.fromLng),
+                    position: LatLng(s.fromLat, s.fromLng),
                     infoWindow: const InfoWindow(title: 'From'),
                   ),
                   Marker(
                     markerId: const MarkerId('to'),
-                    position: LatLng(state.toLat, state.toLng),
+                    position: LatLng(s.toLat, s.toLng),
                     infoWindow: const InfoWindow(title: 'To'),
                   ),
                 },
@@ -57,14 +85,13 @@ class PriceBreakdownLoadedBody extends StatelessWidget {
 
           Align(
             alignment: Alignment.centerLeft,
-            child: BikeTypeBadge(state: state),
+            child: BikeTypeBadge(state: s),
           ),
 
           const SizedBox(height: 8),
 
-          // Avg price
           Text(
-            '${state.avgFare.toStringAsFixed(0)} Rwf',
+            '${s.avgFare.toStringAsFixed(0)} Rwf',
             style: const TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.w700,
@@ -78,65 +105,49 @@ class PriceBreakdownLoadedBody extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // Flat detail rows
           DetailRow(
             leftLabel: 'from',
-            leftValue: state.fromLabel,
+            leftValue: s.fromLabel,
             rightLabel: 'to',
-            rightValue: state.toLabel,
+            rightValue: s.toLabel,
           ),
           const SizedBox(height: 16),
           DetailRow(
             leftLabel: 'distance',
-            leftValue: '${state.distanceKm.toStringAsFixed(1)} km',
-            rightLabel: 'rate per km',
-            rightValue: '${state.pricePerKm.toStringAsFixed(0)} Rwf',
+            leftValue: '${distanceDisplay.toStringAsFixed(1)} $unitLabel',
+            rightLabel: 'rate per $unitLabel',
+            rightValue: '${rateDisplay.toStringAsFixed(0)} Rwf',
           ),
           const SizedBox(height: 16),
           DetailRow(
             leftLabel: 'min price',
-            leftValue: '${state.minFare.toStringAsFixed(0)} Rwf',
+            leftValue: '${s.minFare.toStringAsFixed(0)} Rwf',
             rightLabel: 'max price',
-            rightValue: '${state.maxFare.toStringAsFixed(0)} Rwf',
+            rightValue: '${s.maxFare.toStringAsFixed(0)} Rwf',
           ),
-          if (state.fuelPerKm != null) ...[
+          if (fuelPerUnitDisplay != null && totalFuel != null) ...[
             const SizedBox(height: 16),
-            if (state.bikeType == BikeMode.electric)
+            if (s.bikeType == BikeMode.electric)
               DetailRow(
-                leftLabel: 'charge per km',
-                leftValue: '${state.fuelPerKm!.toStringAsFixed(2)} kWh',
+                leftLabel: 'charge per $unitLabel',
+                leftValue: '${fuelPerUnitDisplay.toStringAsFixed(2)} kWh',
                 rightLabel: 'total charge',
-                rightValue:
-                    '${(state.fuelPerKm! * state.distanceKm).toStringAsFixed(2)} kWh',
+                rightValue: '${totalFuel.toStringAsFixed(2)} kWh',
               )
             else
               DetailRow(
-                leftLabel: 'fuel per km',
-                leftValue: '${state.fuelPerKm!.toStringAsFixed(2)} L',
+                leftLabel: 'fuel per $unitLabel',
+                leftValue: '${fuelPerUnitDisplay.toStringAsFixed(2)} L',
                 rightLabel: 'total fuel',
-                rightValue:
-                    '${(state.fuelPerKm! * state.distanceKm).toStringAsFixed(2)} L',
+                rightValue: '${totalFuel.toStringAsFixed(2)} L',
               ),
           ],
 
           const SizedBox(height: 24),
 
-          // Actions
-          ElevatedButton(
+          ContinueButton(
             onPressed: () => context.go(AppRoutes.feedback),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.ctaFill,
-              foregroundColor: AppColors.ctaText,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              elevation: 0,
-            ),
-            child: const Text(
-              'All Good',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-            ),
+            label: 'All Good',
           ),
           const SizedBox(height: 12),
           OutlinedButton(
