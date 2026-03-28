@@ -68,8 +68,24 @@ class _HomeLocationPickerSheetState extends State<HomeLocationPickerSheet> {
     }
   }
 
-  void _save(double lat, double lng, String label) {
-    sl<PreferencesService>().saveHomeLocation(lat: lat, lng: lng, label: label);
+  void _save(double lat, double lng, String label) async {
+    try {
+      await sl<PreferencesService>().saveHomeLocation(
+        lat: lat,
+        lng: lng,
+        label: label,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to save home location. Please try again.'),
+        ),
+      );
+      return;
+    }
+
+    if (!mounted) return;
     widget.onSaved(lat, lng, label);
     Navigator.of(context).pop();
   }
