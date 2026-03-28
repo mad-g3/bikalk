@@ -6,7 +6,6 @@ import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../application/auth_cubit.dart';
-import '../../application/auth_state.dart';
 import '../../../../core/widgets/screen_heading.dart';
 import '../widgets/auth_form_field.dart';
 
