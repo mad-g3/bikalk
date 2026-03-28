@@ -8,9 +8,9 @@ class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit({
     required FirestoreUserSource userSource,
     required FirebaseAuth firebaseAuth,
-  })  : _userSource = userSource,
-        _firebaseAuth = firebaseAuth,
-        super(ProfileInitial());
+  }) : _userSource = userSource,
+       _firebaseAuth = firebaseAuth,
+       super(ProfileInitial());
 
   final FirestoreUserSource _userSource;
   final FirebaseAuth _firebaseAuth;
@@ -43,8 +43,8 @@ class ProfileCubit extends Cubit<ProfileState> {
     final currentUser = currentState is ProfileLoaded
         ? currentState.user
         : currentState is ProfileSuccess
-            ? currentState.user
-            : null;
+        ? currentState.user
+        : null;
     if (currentUser == null) return;
 
     emit(ProfileUpdating(currentUser));
@@ -66,11 +66,22 @@ class ProfileCubit extends Cubit<ProfileState> {
       emit(ProfileError('Not signed in'));
       return;
     }
+    final currentUser = _firebaseAuth.currentUser;
+    if (currentUser == null) {
+      emit(ProfileError('Not signed in'));
+      return;
+    }
     emit(ProfileLoading());
     try {
+      await currentUser.delete();
       await _userSource.deleteUser(uid);
-      await _firebaseAuth.currentUser?.delete();
       emit(ProfileDeleted());
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        emit(ProfileError('requires-recent-login'));
+      } else {
+        emit(ProfileError(e.message ?? e.toString()));
+      }
     } catch (e) {
       emit(ProfileError(e.toString()));
     }

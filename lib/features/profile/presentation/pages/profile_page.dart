@@ -75,7 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onResetPassword(UserEntity user) {
-    sl<AuthCubit>().sendPasswordReset(user.email);
+    context.read<AuthCubit>().sendPasswordReset(user.email);
     AppSnackBar.info(context, 'Password reset email sent');
   }
 

@@ -36,7 +36,6 @@ class ScreenHeading extends StatelessWidget {
                   constraints: const BoxConstraints(),
                 ),
               ),
-              const SizedBox(height: 8),
             ],
             Expanded(
               child: Column(
