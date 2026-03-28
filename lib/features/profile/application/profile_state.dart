@@ -1,30 +1,57 @@
 import '../../auth/domain/entities/user_entity.dart';
+import 'package:equatable/equatable.dart';
 
-abstract class ProfileState {}
+abstract class ProfileState extends Equatable {
+  const ProfileState();
 
-class ProfileInitial extends ProfileState {}
+  @override
+  List<Object?> get props => [];
+}
 
-class ProfileLoading extends ProfileState {}
+class ProfileInitial extends ProfileState {
+  const ProfileInitial();
+}
+
+class ProfileLoading extends ProfileState {
+  const ProfileLoading();
+}
 
 class ProfileLoaded extends ProfileState {
-  ProfileLoaded(this.user);
+  const ProfileLoaded(this.user);
+
   final UserEntity user;
+
+  @override
+  List<Object?> get props => [user];
 }
 
 class ProfileUpdating extends ProfileState {
-  ProfileUpdating(this.user);
+  const ProfileUpdating(this.user);
+
   final UserEntity user; // keep showing current data while saving
+  @override
+  List<Object?> get props => [user];
 }
 
 class ProfileSuccess extends ProfileState {
-  ProfileSuccess(this.user, this.message);
+  const ProfileSuccess(this.user, this.message);
+
   final UserEntity user;
   final String message;
+
+  @override
+  List<Object?> get props => [user, message];
 }
 
 class ProfileError extends ProfileState {
-  ProfileError(this.message);
+  const ProfileError(this.message);
+
   final String message;
+
+  @override
+  List<Object?> get props => [message];
 }
 
-class ProfileDeleted extends ProfileState {}
+class ProfileDeleted extends ProfileState {
+  const ProfileDeleted();
+}

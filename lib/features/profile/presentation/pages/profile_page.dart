@@ -47,6 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _loadPreferences() {
     final svc = sl<PreferencesService>();
+    if (!mounted) return;
     setState(() {
       _bikeMode = svc.getBikeMode() == BikeMode.petrol ? 'petrol' : 'electric';
       _distanceUnit = svc.getDistanceUnit();
@@ -63,6 +64,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _saveDistanceUnit(String value) async {
     await sl<PreferencesService>().saveDistanceUnit(value);
+    if (!mounted) return;
     setState(() => _distanceUnit = value);
   }
 

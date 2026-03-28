@@ -57,7 +57,6 @@ class ScreenHeading extends StatelessWidget {
             ),
             if (trailing != null) ...[
               Align(alignment: Alignment.centerRight, child: trailing!),
-              const SizedBox(height: 8),
             ],
           ],
         ),
