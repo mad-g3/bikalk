@@ -15,6 +15,7 @@ import '../../../../features/auth/domain/entities/user_entity.dart';
 import '../../../../features/auth/presentation/widgets/auth_form_field.dart';
 import '../../application/profile_cubit.dart';
 import '../../application/profile_state.dart';
+import '../widgets/home_location_picker_sheet.dart';
 import '../widgets/profile_action_row.dart';
 import '../widgets/profile_preference_row.dart';
 import '../widgets/profile_section_label.dart';
@@ -31,6 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _nameCtrl = TextEditingController();
   String _bikeMode = 'electric';
   String _distanceUnit = 'km';
+  ({double lat, double lng, String label})? _homeLocation;
 
   @override
   void initState() {
@@ -51,7 +53,23 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _bikeMode = svc.getBikeMode() == BikeMode.petrol ? 'petrol' : 'electric';
       _distanceUnit = svc.getDistanceUnit();
+      _homeLocation = svc.getHomeLocation();
     });
+  }
+
+  void _onEditHomeLocation() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => HomeLocationPickerSheet(
+        onSaved: (lat, lng, label) {
+          setState(() => _homeLocation = (lat: lat, lng: lng, label: label));
+        },
+      ),
+    );
   }
 
   Future<void> _saveBikeMode(String value) async {
@@ -206,6 +224,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(height: 8),
                     const ProfileSectionLabel('Settings'),
                     const SizedBox(height: 8),
+                    ProfileActionRow(
+                      icon: Icons.home_outlined,
+                      label: 'Home location',
+                      onTap: _onEditHomeLocation,
+                      subtitle: _homeLocation?.label ?? 'Not set',
+                    ),
                     ProfilePreferenceRow(
                       icon: Icons.electric_bolt,
                       label: 'Preferred bike mode',

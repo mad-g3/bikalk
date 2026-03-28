@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/di.dart';
 import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/services/preferences_service.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/widgets/screen_heading.dart';
 import '../../application/location_cubit.dart';
@@ -34,6 +35,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   GoogleMapController? _mapController;
 
   bool _cameraHandled = false;
+  bool _hasFocus = false;
 
   @override
   void initState() {
@@ -52,6 +54,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   }
 
   void _onFocusChanged() {
+    if (mounted) setState(() => _hasFocus = _focusNode.hasFocus);
     if (!_focusNode.hasFocus && mounted) {
       // Small delay so suggestion tap handlers fire before results are cleared
       Future<void>.delayed(const Duration(milliseconds: 120), () {
@@ -123,9 +126,24 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
             state is CurrentLocationSearchResults && state.isSearching;
         final isDetecting = state is CurrentLocationDetecting;
 
-        final suggestions = state is CurrentLocationSearchResults
+        final home = sl<PreferencesService>().getHomeLocation();
+        final homeEntity = home != null
+            ? LocationEntity(
+                latitude: home.lat,
+                longitude: home.lng,
+                displayName: home.label,
+              )
+            : null;
+
+        final searchResults = state is CurrentLocationSearchResults
             ? state.results
             : const <LocationEntity>[];
+
+        final suggestions = [
+          if (homeEntity != null && _hasFocus) homeEntity,
+          ...searchResults,
+        ];
+        final homeIndex = homeEntity != null && _hasFocus ? 0 : -1;
 
         return Scaffold(
           resizeToAvoidBottomInset: false,
@@ -213,6 +231,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
                     stackKey: _stackKey,
                     suggestions: suggestions,
                     onSelected: _onSuggestionSelected,
+                    homeIndex: homeIndex,
                   ),
               ],
             ),

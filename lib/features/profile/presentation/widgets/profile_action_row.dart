@@ -9,12 +9,14 @@ class ProfileActionRow extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.color,
+    this.subtitle,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
   final Color? color;
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +31,19 @@ class ProfileActionRow extends StatelessWidget {
             Icon(icon, size: 20, color: effectiveColor),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                label,
-                style: AppTextStyles.bodyMedium.copyWith(color: effectiveColor),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: effectiveColor,
+                    ),
+                  ),
+                  if (subtitle != null)
+                    Text(subtitle!, style: AppTextStyles.bodySmall),
+                ],
               ),
             ),
             Icon(Icons.chevron_right, size: 20, color: AppColors.textHint),

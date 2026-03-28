@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/di.dart';
 import '../../../../app/routes.dart';
+import '../../../../core/services/preferences_service.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/widgets/continue_button.dart';
@@ -23,7 +24,10 @@ class DestinationScreen extends StatefulWidget {
 }
 
 class _DestinationScreenState extends State<DestinationScreen> {
-  static const _defaultLatLng = LatLng(-1.9403, 29.8739); // Rwanda overview preview
+  static const _defaultLatLng = LatLng(
+    -1.9403,
+    29.8739,
+  ); // Rwanda overview preview
 
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
@@ -34,6 +38,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
   // Tracks when the camera has already been moved by a direct handler
   // so the BlocListener doesn't double-animate it.
   bool _cameraHandled = false;
+  bool _hasFocus = false;
 
   @override
   void initState() {
@@ -52,6 +57,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
   }
 
   void _onFocusChanged() {
+    if (mounted) setState(() => _hasFocus = _focusNode.hasFocus);
     if (!_focusNode.hasFocus && mounted) {
       Future<void>.delayed(const Duration(milliseconds: 120), () {
         if (!mounted || _focusNode.hasFocus) return;
@@ -83,9 +89,9 @@ class _DestinationScreenState extends State<DestinationScreen> {
   void _onMapLongPress(LatLng latLng) {
     _cameraHandled = true;
     context.read<DestinationLocationCubit>().selectFromMapPin(
-          latLng.latitude,
-          latLng.longitude,
-        );
+      latLng.latitude,
+      latLng.longitude,
+    );
     _panTo(latLng);
   }
 
@@ -113,9 +119,24 @@ class _DestinationScreenState extends State<DestinationScreen> {
         final isSearching =
             state is DestinationLocationSearchResults && state.isSearching;
 
-        final suggestions = state is DestinationLocationSearchResults
+        final home = sl<PreferencesService>().getHomeLocation();
+        final homeEntity = home != null
+            ? LocationEntity(
+                latitude: home.lat,
+                longitude: home.lng,
+                displayName: home.label,
+              )
+            : null;
+
+        final searchResults = state is DestinationLocationSearchResults
             ? state.results
             : const <LocationEntity>[];
+
+        final suggestions = [
+          if (homeEntity != null && _hasFocus) homeEntity,
+          ...searchResults,
+        ];
+        final homeIndex = homeEntity != null && _hasFocus ? 0 : -1;
 
         return Scaffold(
           resizeToAvoidBottomInset: false,
@@ -165,8 +186,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
                                   ? const <Marker>{}
                                   : {
                                       Marker(
-                                        markerId:
-                                            const MarkerId('destination'),
+                                        markerId: const MarkerId('destination'),
                                         position: markerLatLng,
                                       ),
                                     },
@@ -201,6 +221,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
                     stackKey: _stackKey,
                     suggestions: suggestions,
                     onSelected: _onSuggestionSelected,
+                    homeIndex: homeIndex,
                   ),
               ],
             ),

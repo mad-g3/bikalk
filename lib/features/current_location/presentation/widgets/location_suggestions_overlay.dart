@@ -14,6 +14,7 @@ class LocationSuggestionsOverlay extends StatefulWidget {
     required this.suggestions,
     required this.onSelected,
     this.horizontalPadding = 24.0,
+    this.homeIndex = -1,
   });
 
   final GlobalKey anchorKey;
@@ -21,6 +22,7 @@ class LocationSuggestionsOverlay extends StatefulWidget {
   final List<LocationEntity> suggestions;
   final ValueChanged<LocationEntity> onSelected;
   final double horizontalPadding;
+  final int homeIndex;
 
   @override
   State<LocationSuggestionsOverlay> createState() =>
@@ -75,6 +77,7 @@ class _LocationSuggestionsOverlayState
             child: LocationSuggestionList(
               suggestions: widget.suggestions,
               onSelected: widget.onSelected,
+              homeIndex: widget.homeIndex,
             ),
           ),
         ),
