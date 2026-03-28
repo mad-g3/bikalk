@@ -12,10 +12,14 @@ class LocationSuggestionList extends StatelessWidget {
     super.key,
     required this.suggestions,
     required this.onSelected,
+    this.homeIndex = -1,
   });
 
   final List<LocationEntity> suggestions;
   final ValueChanged<LocationEntity> onSelected;
+
+  /// Index of the pinned home entry; -1 means no home entry.
+  final int homeIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +45,9 @@ class LocationSuggestionList extends StatelessWidget {
             final item = suggestions[index];
             return ListTile(
               dense: true,
+              leading: index == homeIndex
+                  ? const Icon(Icons.home_outlined, size: 18)
+                  : null,
               title: Text(
                 item.primaryLabel,
                 maxLines: 1,
