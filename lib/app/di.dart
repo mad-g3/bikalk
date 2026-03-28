@@ -20,6 +20,7 @@ import '../features/current_location/domain/repositories/i_location_repository.d
 import '../features/price_breakdown/application/price_breakdown_cubit.dart';
 import '../features/price_breakdown/data/repositories/fare_rate_repository.dart';
 import '../features/price_breakdown/domain/repositories/i_fare_repository.dart';
+import '../features/profile/application/profile_cubit.dart';
 import '../features/report_problem/application/report_problem_cubit.dart';
 import '../features/report_problem/data/repositories/problem_report_repository.dart';
 import '../features/report_problem/data/sources/problem_report_firestore_source.dart';
@@ -102,6 +103,14 @@ Future<void> setupDi() async {
   // Fare rate repository
   sl.registerLazySingleton<IFareRepository>(
     () => FareRateRepository(sl<FirebaseFirestore>()),
+  );
+
+  // Profile cubit factory so each navigation gets a fresh load
+  sl.registerFactory<ProfileCubit>(
+    () => ProfileCubit(
+      userSource: sl<FirestoreUserSource>(),
+      firebaseAuth: sl<FirebaseAuth>(),
+    ),
   );
 
   // Price breakdown cubit factory so each navigation recalculates fresh
