@@ -26,6 +26,30 @@ void main() {
     expect(tapped, isTrue);
   });
 
+  testWidgets('BikeSelectionCard does not crash when tapped multiple times', (
+    tester,
+  ) async {
+    int tapCount = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: BikeSelectionCard(
+            icon: Icons.bolt,
+            label: 'Electric',
+            selected: false,
+            onTap: () => tapCount++,
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(BikeSelectionCard));
+    await tester.tap(find.byType(BikeSelectionCard));
+
+    expect(tapCount, 2);
+  });
+
   testWidgets('BikeSelectionCard shows selected state visually', (
     tester,
   ) async {

@@ -16,6 +16,11 @@ void main() {
       expect(result.avg, (result.min + result.max) / 2);
     });
 
+    test('returns minPrice when distance is zero', () {
+      final result = rate.estimateRange(0);
+      expect(result.min, 500);
+    });
+
     test('applies ±15% variance to base price', () {
       final result = rate.estimateRange(10); // base = 2000
       expect(result.min, closeTo(1700, 1));
@@ -32,6 +37,12 @@ void main() {
         30,
       ); // base = 6000, rawMax = 6900 > 5000
       expect(result.max, 5000);
+    });
+
+    test('avg stays within min and max bounds', () {
+      final result = rate.estimateRange(10);
+      expect(result.avg >= result.min, true);
+      expect(result.avg <= result.max, true);
     });
 
     test('petrol rate entity uses same formula', () {
