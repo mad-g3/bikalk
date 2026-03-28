@@ -6,6 +6,7 @@ import '../../../../app/di.dart';
 import '../../../../app/routes.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
+import '../../../../core/widgets/screen_heading.dart';
 import '../../application/report_problem_cubit.dart';
 import '../../application/report_problem_state.dart';
 
@@ -86,28 +87,9 @@ class _ReportProblemViewState extends State<_ReportProblemView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      icon: const Icon(Icons.arrow_back, size: 30),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Report a Problem',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.titleLarge.copyWith(fontSize: 38),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tell us what went wrong so you can travel with confidence next time.',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
+                  const ScreenHeading(
+                    title: 'Report a Problem',
+                    subtitle: 'Tell us what went wrong so you can travel with confidence next time.',
                   ),
                   const SizedBox(height: 28),
                   DropdownButtonFormField<String>(
@@ -129,8 +111,9 @@ class _ReportProblemViewState extends State<_ReportProblemView> {
                   const SizedBox(height: 20),
                   TextField(
                     controller: _descriptionController,
-                    minLines: 12,
-                    maxLines: 12,
+                    minLines: 6,
+                    maxLines: 8,
+                    keyboardType: TextInputType.multiline,
                     enabled: !state.isSubmitting,
                     onChanged: cubit.updateDescription,
                     decoration: const InputDecoration(

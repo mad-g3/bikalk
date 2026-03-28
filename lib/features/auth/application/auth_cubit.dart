@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../domain/entities/user_entity.dart';
 import '../domain/repositories/i_auth_repository.dart';
 import 'auth_state.dart';
-
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit(this._repository) : super(const AuthInitial());
 
@@ -91,19 +91,20 @@ class AuthCubit extends Cubit<AuthState> {
     if (failure != null) emit(AuthError(failure.message));
   }
 
-  Future<void> sendPasswordReset(String email) async {
-    emit(const AuthLoading());
+  Future<String?> sendPasswordReset(String email) async {
     final (_, failure) = await _repository.sendPasswordResetEmail(email);
-    if (failure != null) {
-      emit(AuthError(failure.message));
-      return;
-    }
-    emit(const PasswordResetSent());
+    return failure?.message;
   }
 
   Future<void> signOut() async {
     // redirect immediately; don't wait on Firebase
     emit(const Unauthenticated());
     await _repository.signOut();
+  }
+
+  void updateUser(UserEntity user) {
+    if (state is Authenticated) {
+      emit(Authenticated(user));
+    }
   }
 }

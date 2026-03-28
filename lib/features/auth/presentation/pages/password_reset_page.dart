@@ -20,6 +20,7 @@ class PasswordResetPage extends StatefulWidget {
 class _PasswordResetPageState extends State<PasswordResetPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -27,64 +28,59 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    context.read<AuthCubit>().sendPasswordReset(_emailCtrl.text.trim());
+    setState(() => _isLoading = true);
+    final error = await context.read<AuthCubit>().sendPasswordReset(_emailCtrl.text.trim());
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+    
+    if (error != null) {
+      AppSnackBar.error(context, error);
+    } else {
+      AppSnackBar.success(context, 'Reset link sent — check your email.');
+      context.pop();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthCubit, AuthState>(
-      listener: (context, state) {
-        if (state is PasswordResetSent) {
-          AppSnackBar.success(context, 'Reset link sent — check your email.');
-          context.pop();
-        } else if (state is AuthError) {
-          AppSnackBar.error(context, state.message);
-        }
-      },
-      child: Scaffold(
-        body: SafeArea(
-          child: BlocBuilder<AuthCubit, AuthState>(
-            builder: (context, state) {
-              final loading = state is AuthLoading;
-              return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 32,
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 32,
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const ScreenHeading(
+                  title: 'Forgot your password?',
+                  subtitle: "Enter your email and we'll send you a reset link.",
                 ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const ScreenHeading(
-                        title: 'Forgot your password?',
-                        subtitle: "Enter your email and we'll send you a reset link.",
-                      ),
-                      const SizedBox(height: 32),
-                      AuthFormField(
-                        label: 'Email',
-                        hint: 'you@example.com',
-                        controller: _emailCtrl,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.done,
-                        onFieldSubmitted: (_) => _submit(),
-                        validator: AppValidators.email,
-                      ),
-                      const SizedBox(height: 32),
-                      if (loading)
-                        const AppLoadingIndicator()
-                      else
-                        ElevatedButton(
-                          onPressed: _submit,
-                          child: const Text('Send reset link'),
-                        ),
-                    ],
+                const SizedBox(height: 32),
+                AuthFormField(
+                  label: 'Email',
+                  hint: 'you@example.com',
+                  controller: _emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _submit(),
+                  validator: AppValidators.email,
+                ),
+                const SizedBox(height: 32),
+                if (_isLoading)
+                  const AppLoadingIndicator()
+                else
+                  ElevatedButton(
+                    onPressed: _submit,
+                    child: const Text('Send reset link'),
                   ),
-                ),
-              );
-            },
+              ],
+            ),
           ),
         ),
       ),

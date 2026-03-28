@@ -49,7 +49,4 @@ class AwaitingEmailVerification extends AuthState {
   List<Object?> get props => [user];
 }
 
-// Password reset email was sent successfully
-class PasswordResetSent extends AuthState {
-  const PasswordResetSent();
-}
+
