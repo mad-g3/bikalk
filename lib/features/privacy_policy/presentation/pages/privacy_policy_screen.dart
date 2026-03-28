@@ -19,7 +19,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               const ScreenHeading(title: 'Privacy Policy'),
               const SizedBox(height: 24),
               const Text(
-                'Bikak collects only the data necessary to provide accurate fare estimates, specifically your current location, destination, and choice of motorcycle type. This information is processed in real-time to calculate distance and energy efficiency offsets, ensuring you have a factual basis for negotiation. We do not use this data to build personal movement profiles, and location access is only active while the app is being used to generate a price breakdown.',
+                'Bikalk collects only the data necessary to provide accurate fare estimates, specifically your current location, destination, and choice of motorcycle type. This information is processed in real-time to calculate distance and energy efficiency offsets, ensuring you have a factual basis for negotiation. We do not use this data to build personal movement profiles, and location access is only active while the app is being used to generate a price breakdown.',
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.75,

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../app/di.dart';
 import '../../../../app/routes.dart';
+import '../../../../core/domain/bike_mode.dart';
+import '../../../../features/homeScreen/application/bike_selection_cubit.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_snackbar.dart';
@@ -58,6 +60,9 @@ class _ProfilePageState extends State<ProfilePage> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_kBikeMode, value);
     setState(() => _bikeMode = value);
+    // Keep the home screen cubit in sync so the selection updates immediately
+    final mode = value == 'petrol' ? BikeMode.petrol : BikeMode.electric;
+    sl<BikeSelectionCubit>().selectMode(mode);
   }
 
   Future<void> _saveDistanceUnit(String value) async {
