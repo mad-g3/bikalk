@@ -92,9 +92,14 @@ class _ProfilePageState extends State<ProfilePage> {
     context.read<ProfileCubit>().updateName(name);
   }
 
-  void _onResetPassword(UserEntity user) {
-    context.read<AuthCubit>().sendPasswordReset(user.email);
-    AppSnackBar.info(context, 'Password reset email sent');
+  Future<void> _onResetPassword(UserEntity user) async {
+    final error = await sl<AuthCubit>().sendPasswordReset(user.email);
+    if (!mounted) return;
+    if (error != null) {
+      AppSnackBar.error(context, error);
+    } else {
+      AppSnackBar.info(context, 'Password reset email sent');
+    }
   }
 
   void _onDeleteAccount() {
@@ -132,6 +137,7 @@ class _ProfilePageState extends State<ProfilePage> {
         } else if (state is ProfileSuccess) {
           AppSnackBar.success(context, state.message);
           _nameCtrl.text = state.user.name;
+          sl<AuthCubit>().updateUser(state.user);
         } else if (state is ProfileError) {
           AppSnackBar.error(context, state.message);
         } else if (state is ProfileDeleted) {
