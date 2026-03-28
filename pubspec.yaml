@@ -58,6 +58,9 @@ dependencies:
   # Dependency injection
   get_it:
 
+  # Preferences
+  shared_preferences:
+
   # Fonts
   google_fonts:
   web: ^1.1.1

@@ -13,6 +13,7 @@ class AppRoutes {
 
   // Core flow
   static const home = '/home';
+  static const profile = '/profile';
   static const currentLocation = '/current-location';
   static const destinationLocation = '/destination-location';
   static const priceBreakdown = '/price-breakdown';

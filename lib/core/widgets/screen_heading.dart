@@ -8,42 +8,59 @@ class ScreenHeading extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.showBackButton = true,
+    this.trailing,
   });
 
   final String title;
   final String? subtitle;
   final bool showBackButton;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (showBackButton) ...[
-          Align(
-            alignment: Alignment.centerLeft,
-            child: IconButton(
-              onPressed: () => Navigator.of(context).maybePop(),
-              icon: const Icon(Icons.arrow_back, size: 24),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
+        const SizedBox(height: 30),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            if (showBackButton) ...[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  icon: const Icon(Icons.arrow_back, size: 28),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(title, style: AppTextStyles.headlineMedium),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      subtitle!,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-        ],
-        Text(
-          title,
-          style: AppTextStyles.headlineMedium,
+            if (trailing != null) ...[
+              Align(alignment: Alignment.centerRight, child: trailing!),
+              const SizedBox(height: 8),
+            ],
+          ],
         ),
-        if (subtitle != null) ...[
-          const SizedBox(height: 6),
-          Text(
-            subtitle!,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ],
       ],
     );
   }

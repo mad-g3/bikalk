@@ -22,4 +22,12 @@ class FirestoreUserSource {
   Future<void> updateEmailVerified(String userId, {required bool verified}) {
     return _users.doc(userId).update({'isEmailVerified': verified});
   }
+
+  Future<void> updateName(String userId, String name) {
+    return _users.doc(userId).update({'name': name});
+  }
+
+  Future<void> deleteUser(String userId) {
+    return _users.doc(userId).delete();
+  }
 }
